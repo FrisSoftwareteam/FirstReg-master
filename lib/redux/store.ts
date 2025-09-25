@@ -1,24 +1,28 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
+import type { Storage } from "redux-persist";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import counterReducer from "@/lib/redux/slices/counterSlice";
 import { baseApi } from "@/lib/services/baseApi";
 
-const createNoopStorage = () => {
+const createNoopStorage = (): Storage => {
   return {
     getItem(_key: string) {
-      return Promise.resolve(null);
+      return Promise.resolve<string | null>(null);
     },
-    setItem(_key: string, value: string) {
-      return Promise.resolve(value);
+    setItem(_key: string, _value: string) {
+      return Promise.resolve();
     },
     removeItem(_key: string) {
       return Promise.resolve();
     },
-  } as Storage;
+  };
 };
 
-const storage = typeof window !== "undefined" ? createWebStorage("local") : createNoopStorage();
+const storage: Storage =
+  typeof window !== "undefined"
+    ? (createWebStorage("local") as unknown as Storage)
+    : createNoopStorage();
 
 const rootReducer = combineReducers({
   counter: counterReducer,

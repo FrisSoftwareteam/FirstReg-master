@@ -1,72 +1,189 @@
 "use client";
 
-import { z } from "zod";
 import { useState } from "react";
-import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Mail, Key, Check, User } from "lucide-react";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  rememberMe: z.boolean(),
 });
 
-type LoginValues = z.infer<typeof loginSchema>;
+type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const [values, setValues] = useState<LoginValues>({ email: "", password: "" });
-  const [errors, setErrors] = useState<Partial<Record<keyof LoginValues, string>>>({});
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      rememberMe: false,
+    },
+  });
 
-  const onChange = (field: keyof LoginValues) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValues((v) => ({ ...v, [field]: e.target.value }));
-  };
+  const rememberMe = watch("rememberMe");
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitError(null);
-    const parsed = loginSchema.safeParse(values);
-    if (!parsed.success) {
-      const fieldErrors: Partial<Record<keyof LoginValues, string>> = {};
-      for (const issue of parsed.error.issues) {
-        const path = issue.path[0] as keyof LoginValues;
-        if (path) fieldErrors[path] = issue.message;
-      }
-      setErrors(fieldErrors);
-      return;
-    }
-    setErrors({});
-    // Replace this with your auth logic (e.g., RTK Query mutation)
-    alert(`Logged in as ${parsed.data.email}`);
+  const onSubmit = async (data: LoginForm) => {
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("Login data:", data);
+    setIsLoading(false);
   };
 
   return (
-    <main className="mx-auto max-w-sm p-6">
-      <div className="space-y-2 mb-6 text-center">
-        <h1 className="text-2xl font-semibold">Login</h1>
-        <p className="text-sm text-muted-foreground">Welcome back. Please sign in.</p>
+    <div
+      className="min-h-screen bg-white bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: "url('/login.png')",
+      }}
+    >
+      <div className="min-h-screen flex bg-[rgba(255,255,255,0.5)]">
+        {/* Left side - Login Form */}
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-lg bg-white rounded shadow-lg border border-gray-100 py-12 px-8 space-y-6 min-h-[55vh]">
+            <div className="text-center space-y-2 mt-16 lg:mt-0 mb-10">
+              <h1 className="text-3xl font-ubuntu font-[500] text-textBlack text-balance">
+                Welcome to E-Stock
+              </h1>
+              <p className="text-base text-textBlack font-poppins">
+                Please enter your official email details to sign in
+              </p>
+            </div>
+
+            {/* Form */}
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-4 flex flex-col gap-4"
+            >
+              <div className="space-y-1">
+                <Label htmlFor="email" className="sr-only">
+                  Email Address
+                </Label>
+                <div className="relative">
+                  <Mail
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-4 w-4 fill-[#5A5A5A]"
+                    fill="currentColor"
+                  />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Email Address"
+                    className="pl-10 h-12 bg-[#F2F2F2] border border-gray-200 focus:border-gray-300 focus:ring-0 text-sm placeholder:text-gray-400"
+                    {...register("email")}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-xs text-red-600">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="password" className="sr-only">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5A5A5A] h-4 w-4" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Password"
+                    className="pl-10 h-12 bg-[#F2F2F2] border border-gray-200 focus:border-gray-300 focus:ring-0 text-sm placeholder:text-gray-400"
+                    {...register("password")}
+                  />
+                </div>
+                {errors.password && (
+                  <p className="text-xs text-red-600">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) =>
+                      setValue("rememberMe", !!checked)
+                    }
+                    className="h-4 w-4"
+                  />
+                  <Label
+                    htmlFor="rememberMe"
+                    className="text-sm text-gray-700 font-normal"
+                  >
+                    Remember me
+                  </Label>
+                </div>
+                <button
+                  type="button"
+                  className="text-sm text-gray-600 hover:text-gray-900 underline"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+
+              <div className="pt-4">
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-full text-sm"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Signing in..." : "Sign in"}{" "}
+                  <User className="ml-2 text-[#F2F2F2]" size={16} />
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Right side - Marketing Content */}
+        <div className="hidden lg:flex flex-1 items-center justify-start px-8 xl:px-16">
+          <div className="max-w-md space-y-8">
+            <div className="space-y-6">
+              <h2 className="text-3xl font-ubuntu font-[500] text-textBlack leading-tight text-balance">
+                Solution For The
+                <br />
+                Registrars Industry
+              </h2>
+              <p className="text-lg font-ubuntu text-[22px] text-textBlack font-[500] text-nowrap">
+                {"Manage clients' shareholder data and many more"}
+              </p>
+            </div>
+
+            <div className="space-y-3 flex flex-col gap-4">
+              {[
+                "Seamless Setup & Control",
+                "Efficient Processes",
+                "Powerful Enquiries",
+                "Insightful Reporting",
+              ].map((feature, index) => (
+                <div key={index} className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="w-2 h-2 text-white stroke-[3]" />
+                  </div>
+                  <span className="text-textBlack font-poppins font-[400] text-sm">
+                    {feature}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" value={values.email} onChange={onChange("email")} />
-          {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" value={values.password} onChange={onChange("password")} />
-          {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
-        </div>
-        {submitError && <p className="text-sm text-red-600">{submitError}</p>}
-        <Button type="submit" className="w-full">Sign in</Button>
-      </form>
-
-      <p className="mt-4 text-sm text-center text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <Link className="text-primary underline-offset-4 hover:underline" href="/signup">Sign up</Link>
-      </p>
-    </main>
+    </div>
   );
 }
