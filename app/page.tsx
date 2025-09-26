@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, Key, Check, User } from "lucide-react";
+import { Mail, Key, Check, User, Eye, EyeOff } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -20,6 +20,8 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const {
     register,
     handleSubmit,
@@ -34,6 +36,11 @@ export default function LoginPage() {
   });
 
   const rememberMe = watch("rememberMe");
+  const {
+    ref: passwordRef,
+    onBlur: rhfPasswordOnBlur,
+    ...passwordFieldProps
+  } = register("password");
 
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
@@ -77,6 +84,7 @@ export default function LoginPage() {
                     className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-4 w-4 fill-[#5A5A5A]"
                     fill="currentColor"
                   />
+                  <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-6 w-[0.5px] bg-[#a8a7a7]"></div>
                   <Input
                     id="email"
                     type="email"
@@ -96,13 +104,35 @@ export default function LoginPage() {
                 </Label>
                 <div className="relative">
                   <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5A5A5A] h-4 w-4" />
+                  <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-6 w-[0.5px] bg-[#a8a7a7]"></div>
                   <Input
                     id="password"
-                    type="password"
+                    type={isPasswordVisible ? "text" : "password"}
                     placeholder="Password"
                     className="pl-10 h-12 bg-[#F2F2F2] border border-gray-200 focus:border-gray-300 focus:ring-0 text-sm placeholder:text-gray-400"
-                    {...register("password")}
+                    onFocus={() => setIsPasswordFocused(true)}
+                    onBlur={(e) => {
+                      setIsPasswordFocused(false);
+                      rhfPasswordOnBlur(e);
+                    }}
+                    ref={passwordRef}
+                    {...passwordFieldProps}
                   />
+                  {isPasswordFocused && (
+                    <button
+                      type="button"
+                      aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5A5A5A]"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => setIsPasswordVisible((v) => !v)}
+                    >
+                      {isPasswordVisible ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  )}
                 </div>
                 {errors.password && (
                   <p className="text-xs text-red-600">
