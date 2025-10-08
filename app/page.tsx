@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, Key, Check, User, Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -34,6 +35,7 @@ export default function LoginPage() {
       rememberMe: false,
     },
   });
+  const router = useRouter();
 
   const rememberMe = watch("rememberMe");
   const {
@@ -47,6 +49,8 @@ export default function LoginPage() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log("Login data:", data);
+    // Redirect to dashboard
+    router.push("/dashboard");
     setIsLoading(false);
   };
 
@@ -60,12 +64,12 @@ export default function LoginPage() {
       <div className="min-h-screen flex bg-[rgba(255,255,255,0.5)]">
         {/* Left side - Login Form */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-lg bg-white rounded shadow-lg border border-gray-100 py-12 px-8 space-y-6 min-h-[55vh]">
+          <div className="w-full max-w-[550px] bg-white rounded shadow-lg border border-gray-100 py-12 px-8 space-y-6 min-h-[55vh]">
             <div className="text-center space-y-2 mt-16 lg:mt-0 mb-10">
               <h1 className="text-3xl font-ubuntu font-[500] text-textBlack text-balance">
                 Welcome to E-Stock
               </h1>
-              <p className="text-base text-textBlack font-poppins">
+              <p className="text-[18px] text-textBlack font-poppins">
                 Please enter your official email details to sign in
               </p>
             </div>
@@ -121,7 +125,9 @@ export default function LoginPage() {
                   {isPasswordFocused && (
                     <button
                       type="button"
-                      aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                      aria-label={
+                        isPasswordVisible ? "Hide password" : "Show password"
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5A5A5A]"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => setIsPasswordVisible((v) => !v)}
@@ -184,12 +190,12 @@ export default function LoginPage() {
         <div className="hidden lg:flex flex-1 items-center justify-start px-8 xl:px-16">
           <div className="max-w-md space-y-8">
             <div className="space-y-6">
-              <h2 className="text-3xl font-ubuntu font-[500] text-textBlack leading-tight text-balance">
+              <h2 className="text-[35px] font-ubuntu font-[500] text-primaryDarkText leading-tight text-balance mb-11">
                 Solution For The
                 <br />
                 Registrars Industry
               </h2>
-              <p className="text-lg font-ubuntu text-[22px] text-textBlack font-[500] text-nowrap">
+              <p className="text-lg font-ubuntu text-[26px] text-primaryDarkText font-[500] text-nowrap">
                 {"Manage clients' shareholder data and many more"}
               </p>
             </div>
@@ -205,7 +211,7 @@ export default function LoginPage() {
                   <div className="w-3 h-3 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <Check className="w-2 h-2 text-white stroke-[3]" />
                   </div>
-                  <span className="text-textBlack font-poppins font-[400] text-sm">
+                  <span className="text-textBlack font-poppins font-[400] text-[18px]">
                     {feature}
                   </span>
                 </div>

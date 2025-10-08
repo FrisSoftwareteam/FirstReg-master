@@ -28,6 +28,10 @@ const config: Config = {
           DEFAULT: "hsl(var(--text-black))",
           foreground: "hsl(var(--text-black-foreground))",
         },
+        primaryDarkText: {
+          DEFAULT: "var(--primary-dark-text)",
+          // foreground: "hsl(var(--primary-dark-text-foreground))",
+        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",

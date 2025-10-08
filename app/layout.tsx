@@ -7,12 +7,16 @@ const ubuntu = Ubuntu({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   variable: "--font-ubuntu",
+  display: "swap",
+  preload: true,
 });
 
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
