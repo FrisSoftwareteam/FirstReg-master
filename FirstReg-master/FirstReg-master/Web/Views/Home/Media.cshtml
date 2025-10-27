@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Media";
+}
+
+<section class="video-promo-with-icon ptb-60">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-10">
+                <div class="section-heading text-center">
+                    <h1>Media Gallery</h1>
+                    <p>Information is key. Learn more about your shares and dividends.</p>
+                    <p style="display: inline;">
+            “FIRST REGISTRARS & INVESTOR SERVICES LIMITED IS DULY REGISTERED AND REGULATED BY THE SECURITIES & EXCHANGE COMMISSION, NIGERIA.”
+        </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var item in Tools.GetMedia())
+            {
+                <div class="col-sm-4 mb-5">
+                    <div class="video-bg-with-icon" 
+                         style="background: url('/img/media/@item.Banner') no-repeat center center; background-size: cover;">
+                        <a href="@item.Url" class="popup-youtube">
+                            <i class="fas fa-play"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

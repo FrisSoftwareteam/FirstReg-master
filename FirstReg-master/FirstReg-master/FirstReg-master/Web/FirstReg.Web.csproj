@@ -1,0 +1,2 @@
+<TargetFramework>net7.0</TargetFramework>
+<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.0" /> 
