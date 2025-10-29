@@ -6,7 +6,10 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: your-appservice-name   # Update in repo Variables or edit here
+  # Exact App Service name from Azure Portal (Overview -> Name)
+  AZURE_WEBAPP_NAME: Project-T
+  AZUREAPPSERVICE_PUBLISHPROFILE: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+
 
 jobs:
   deploy:
@@ -15,6 +18,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate configuration
+        run: |
+          if [ -z "${AZURE_WEBAPP_NAME}" ]; then
+            echo "AZURE_WEBAPP_NAME is empty. Set it in the workflow or repo variables." >&2
+            exit 1
+          fi
+          echo "Deploying to App Service: ${AZURE_WEBAPP_NAME}"
+
       # Deploy source so App Service (Oryx) builds on server
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
@@ -22,4 +33,3 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
-
