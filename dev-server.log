@@ -1,0 +1,9 @@
+ ⚠ turbopack.root should be absolute, using: C:\Users\Administrator\Documents\My Projects\projectT-Front-main
+   ▲ Next.js 16.0.1 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.56.1:3000
+
+ ✓ Starting...
+ ✓ Ready in 1689ms
+ ○ Compiling / ...
+ GET / 200 in 6.0s (compile: 5.5s, render: 453ms)

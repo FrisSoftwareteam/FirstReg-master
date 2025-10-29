@@ -1,0 +1,25 @@
+name: Deploy Next.js to Azure App Service (Standard)
+
+on:
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: your-appservice-name   # Update in repo Variables or edit here
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Deploy source so App Service (Oryx) builds on server
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: .
+
