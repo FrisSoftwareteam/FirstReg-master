@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ReduxProvider } from "@/lib/redux/ReduxProvider";
 import { Ubuntu, Poppins } from "next/font/google";
 
 const ubuntu = Ubuntu({
@@ -31,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${ubuntu.variable} ${poppins.variable}`}
     >
       <body className="font-sans antialiased">
-        {children}
+        <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>
   );
