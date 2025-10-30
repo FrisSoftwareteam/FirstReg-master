@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+// Frontend-only separation: no implicit auth cookies/tokens are read here.
+// Consumers should inject any headers explicitly per-request if needed.
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
 
 export const baseApi = createApi({
@@ -7,13 +9,6 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL || "https://jsonplaceholder.typicode.com",
     prepareHeaders: (headers) => {
-      // Optional: send bearer token from non-httpOnly cookie for client-side calls
-      // For production, prefer using server-side route handlers that attach the token securely.
-      if (typeof document !== "undefined") {
-        const match = document.cookie.match(/(?:^|; )auth_token=([^;]*)/);
-        const token = match ? decodeURIComponent(match[1]) : "";
-        if (token) headers.set("Authorization", token);
-      }
       headers.set("Accept", "application/json");
       return headers;
     },
