@@ -19,12 +19,13 @@ export default function CountryAdmin() {
       title: "States",
       description:
         "Set up states for a complete residential and postal address of shareholders of the registered company.",
-      href: "/dashboard/general-parameters/country-administration",
+      href: "/dashboard/general-parameters/country-admin/states",
     },
     {
-      title: "Register Administration",
-      description: "Set up and maintain shareholder registers seamlessly.",
-      href: "/dashboard/general-parameters/register-administration",
+      title: "Cities",
+      description:
+        "Set up cities for a complete residential and postal address of shareholders of the registered company.",
+      href: "/dashboard/general-parameters/country-admin/cities",
     },
     {
       title: "Holder's Administration",
@@ -51,7 +52,7 @@ export default function CountryAdmin() {
         <Breadcrumb />
 
         <h1 className="text-4xl font-ubuntu mx-[28px] font-[500] text-primary mb-40">
-          General Parameters
+          Country Administration
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-[54px] gap-x-[98px] justify-items-center">

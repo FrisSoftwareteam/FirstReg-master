@@ -47,41 +47,60 @@ export default function Breadcrumb() {
   };
 
   return (
-    <div className="flex mx-[28px] items-center gap-4 mb-8">
-      {/* Back Button */}
-      <button
-        onClick={handleGoBack}
-        className="flex items-center gap-2 text-primary hover:text-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={!canGoBack}
-      >
-        <ArrowBigLeft />
-        <span className="font-medium">BACK</span>
-      </button>
+    <>
+      <div className="px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          {/* Back Button - Full width on mobile, auto on larger screens */}
+          <button
+            onClick={handleGoBack}
+            className="flex items-center gap-2 text-primary hover:text-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center sm:justify-start py-2 px-3 sm:py-1 sm:px-0 border border-gray-200 rounded-lg sm:border-none"
+            disabled={!canGoBack}
+          >
+            <ArrowBigLeft className="w-5 h-5" />
+            <span className="font-medium text-sm sm:text-base">BACK</span>
+          </button>
 
-      {/* Breadcrumb Separator */}
-      <span className="text-gray-400">|</span>
+          {/* Breadcrumb Separator - Hidden on mobile */}
+          <span className="hidden sm:inline text-gray-400">|</span>
 
-      {/* Breadcrumb Items */}
-      <div className="flex items-center gap-2">
-        {breadcrumbs.map((item, index) => (
-          <div key={item.href} className="flex items-center gap-2">
-            {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+          {/* Breadcrumb Items - Scrollable on mobile */}
+          <div className="w-full overflow-x-auto hide-scrollbar">
+            <div className="flex items-center gap-1 sm:gap-2 min-w-max py-1">
+              {breadcrumbs.map((item, index) => (
+                <div key={item.href} className="flex items-center gap-1 sm:gap-2">
+                  {index > 0 && (
+                    <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
+                  )}
 
-            {index === breadcrumbs.length - 1 ? (
-              // Current page (non-clickable)
-              <span className="text-gray-600 font-medium">{item.label}</span>
-            ) : (
-              // Previous pages (clickable)
-              <button
-                onClick={() => handleNavigation(item.href, item.label)}
-                className="text-blue-900 hover:text-blue-700 transition-colors font-medium"
-              >
-                {item.label}
-              </button>
-            )}
+                  {index === breadcrumbs.length - 1 ? (
+                    // Current page (non-clickable)
+                    <span className="text-sm sm:text-base text-gray-700 font-medium whitespace-nowrap">
+                      {item.label}
+                    </span>
+                  ) : (
+                    // Previous pages (clickable)
+                    <button
+                      onClick={() => handleNavigation(item.href, item.label)}
+                      className="text-sm sm:text-base text-blue-900 hover:text-blue-700 transition-colors font-medium whitespace-nowrap px-2 py-1 rounded hover:bg-blue-50"
+                    >
+                      {item.label}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
+        </div>
       </div>
-    </div>
+      <style jsx global>{`
+        .hide-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;  /* Chrome, Safari and Opera */
+        }
+      `}</style>
+    </>
   );
 }
