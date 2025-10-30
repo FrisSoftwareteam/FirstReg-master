@@ -148,7 +148,7 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
+                {/* <div className="flex items-center space-x-2">
                   <Checkbox
                     id="rememberMe"
                     checked={rememberMe}
@@ -169,7 +169,7 @@ export default function LoginPage() {
                   className="text-sm text-gray-600 hover:text-gray-900 underline"
                 >
                   Forgot Password?
-                </button>
+                </button> */}
               </div>
 
               <div className="pt-4">
