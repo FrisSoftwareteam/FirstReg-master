@@ -64,7 +64,7 @@ export default function LoginPage() {
       <div className="min-h-screen flex bg-[rgba(255,255,255,0.5)]">
         {/* Left side - Login Form */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-[550px] bg-white rounded shadow-lg border border-gray-100 py-12 px-8 space-y-6 min-h-[55vh]">
+          <div className="w-full max-w-[650px] bg-white rounded shadow-lg border border-gray-100 py-12 px-8 space-y-6 min-h-[55vh]">
             <div className="text-center space-y-2 mt-16 lg:mt-0 mb-10">
               <h1 className="text-3xl font-ubuntu font-[500] text-textBlack text-balance">
                 Welcome to E-Stock
@@ -148,7 +148,7 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                {/* <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
                   <Checkbox
                     id="rememberMe"
                     checked={rememberMe}
@@ -164,7 +164,7 @@ export default function LoginPage() {
                     Remember me
                   </Label>
                 </div>
-                <button
+                {/* <button
                   type="button"
                   className="text-sm text-gray-600 hover:text-gray-900 underline"
                 >
@@ -190,12 +190,12 @@ export default function LoginPage() {
         <div className="hidden lg:flex flex-1 items-center justify-start px-8 xl:px-16">
           <div className="max-w-md space-y-8">
             <div className="space-y-6">
-              <h2 className="text-[35px] font-ubuntu font-[500] text-primaryDarkText leading-tight text-balance mb-11">
+              <h2 className="text-[40px] font-ubuntu font-[500] text-primaryDarkText leading-tight text-balance mb-11">
                 Solution For The
                 <br />
                 Registrars Industry
               </h2>
-              <p className="text-lg font-ubuntu text-[26px] text-primaryDarkText font-[500] text-nowrap">
+              <p className="font-ubuntu text-primaryDarkText font-[500] text-nowrap text-xl sm:text-2xl lg:text-xl xl:text-2xl">
                 {"Manage clients' shareholder data and many more"}
               </p>
             </div>
