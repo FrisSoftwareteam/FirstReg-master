@@ -14,31 +14,37 @@ export default function GeneralParameters() {
       title: "User Administration",
       description: "Create, manage, and control user access with ease.",
       href: "/dashboard/general-parameters/user-admin",
+      icon: "/Vector2.png",
     },
     {
       title: "Country Administration",
       description: "Define and manage country details for accurate records",
       href: "/dashboard/general-parameters/country-admin",
+      icon: "/Vector2.png",
     },
     {
       title: "Register Administration",
       description: "Set up and maintain shareholder registers seamlessly.",
       href: "/dashboard/general-parameters/register-administration",
+      icon: "/Vector2.png",
     },
     {
       title: "Holder's Administration",
       description: "Manage shareholder information and profiles efficiently.",
       href: "/dashboard/general-parameters/holder-administration",
+      icon: "/Vector2.png",
     },
     {
       title: "Agent Administration",
       description: "Add and oversee agents linked to registers or holders",
       href: "/dashboard/general-parameters/agent-administration",
+      icon: "/Vector2.png",
     },
     {
       title: "Correspondence Administration",
       description: "Organize and track correspondence across departments.",
       href: "/dashboard/general-parameters/correspondence-administration",
+      icon: "/Vector2.png",
     },
   ];
 
@@ -59,10 +65,13 @@ export default function GeneralParameters() {
               key={index}
               title={module.title}
               icon={
-                <>
-                  <div className="w-3 h-3 bg-primary" />
-                  <div className="w-3 h-3 bg-primary" />
-                </>
+                <div className="w-6 h-6">
+                  <img
+                    src={module.icon}
+                    alt={module.title}
+                    className="w-full h-1/2"
+                  />
+                </div>
               }
               description={module.description}
               onClick={() => navigateWithBreadcrumb(module.href, module.title)}
