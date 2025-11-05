@@ -1,6 +1,5 @@
 "use client";
 
-import Header from "@/components/header";
 import Breadcrumb from "@/components/breadcrumb";
 import ModuleCard from "@/components/module-card";
 import { useBreadcrumbNavigation } from "../../hooks/useBreadcrumbNavigation";
@@ -48,8 +47,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
-      <Header />
-
       <main className="px-6 py-8">
         <Breadcrumb />
 
