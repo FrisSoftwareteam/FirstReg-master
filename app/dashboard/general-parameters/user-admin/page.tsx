@@ -9,23 +9,8 @@ import {
 } from "@/components/components/ui/avatar";
 import { Button } from "@/components/components/ui/button";
 import { Checkbox } from "@/components/components/ui/checkbox";
-import { PiMicrosoftOutlookLogoBold } from "react-icons/pi";
 import { Mail, Phone } from "lucide-react";
-import Header from "@/components/header";
 import Breadcrumb from "@/components/breadcrumb";
-
-// import { useState } from "react";
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { Button } from "@/components/ui/button";
-// import { Checkbox } from "@/components/ui/checkbox";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-import { Bell, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 
 export default function UserAdministration() {
   const [selectedUser, setSelectedUser] = useState("Emmanuel Effiong");
@@ -186,8 +171,6 @@ export default function UserAdministration() {
 
   return (
     <div className="min-h-screen bg-[#e8e8e8]">
-      <Header />
-
       <main className="px-4 sm:px-6 md:px-10 lg:px-14 py-6 md:py-8">
         <Breadcrumb />
         <h1 className=" mx-[0px] font-ubuntu font-500 mb-8 text-3xl text-primary">
@@ -231,7 +214,7 @@ export default function UserAdministration() {
                 />
               </div>
 
-              <div className="mb-4 flex gap-6 justify-between w-[85%] mr-6">
+              <div className="mb-4 flex gap-6 justify-between w-[85%] mr-6 flex-wrap">
                 <div className="flex items-center gap-2">
                   <label htmlFor="special-user" className="text-sm">
                     Management /Special User
@@ -256,38 +239,38 @@ export default function UserAdministration() {
             </div>
 
             {/* Right: User Details and Modify Button */}
-            <div className="flex flex-1 flex-col gap-4">
-              {/* User Details */}
-              <div className="space-y-2 text-sm">
-                <div>
-                  <p className="text-xs font-bold text-gray-600 tracking-wide">
-                    DEPT:
-                  </p>
-                  <p className="font-medium text-gray-900">
-                    Information Technology
-                  </p>
+            <div className="flex flex-1 flex-col gap-6 h-full p-6">
+              <div className="flex gap-4 flex-wrap">
+                {/* User Details */}
+                <div className="space-y-2 text-sm">
+                  <div className="">
+                    <p className="text-sm font-bold text-gray-600 tracking-wide">
+                      DEPT: Information Technology
+                    </p>
+                    {/* <p className="font-medium text-gray-900"></p> */}
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-600 tracking-wide">
+                      ID: FRIS-0220
+                    </p>
+                    {/* <p className="font-medium text-gray-900"></p> */}
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-gray-600 tracking-wide">
-                    ID:
-                  </p>
-                  <p className="font-medium text-gray-900">FRIS-0220</p>
-                </div>
-              </div>
 
-              {/* Contact Details with Icons */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-blue-600" />
-                  <p className="text-sm font-medium text-blue-600">
-                    emmanuel.effiong@firstreg...
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-gray-600" />
-                  <p className="text-sm font-medium text-gray-900">
-                    (+234) 080 43212353
-                  </p>
+                {/* Contact Details with Icons */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-blue-600" />
+                    <p className="text-sm font-bold text-primary overflow-hidden text-ellipsis md:overflow-visible max-w-[200px]">
+                      emmanuel.effiong@firstregistrarsnigeria.com
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-gray-600" />
+                    <p className="text-sm font-medium text-gray-900">
+                      (+234) 080 43212353
+                    </p>
+                  </div>
                 </div>
               </div>
 

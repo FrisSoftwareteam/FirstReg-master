@@ -1,9 +1,7 @@
 "use client";
 
-import Header from "@/components/header";
 import Breadcrumb from "@/components/breadcrumb";
 import { useBreadcrumbNavigation } from "../../../hooks/useBreadcrumbNavigation";
-// import Module from "module";
 import ModuleCard from "@/components/module-card";
 
 export default function GeneralParameters() {
@@ -50,8 +48,6 @@ export default function GeneralParameters() {
 
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
-      <Header />
-
       <main className="px-6 py-8">
         <Breadcrumb />
 
