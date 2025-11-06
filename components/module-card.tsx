@@ -21,7 +21,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`bg-white rounded-lg px-8 py-10 shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md hover:bg-[rgba(253,253,250,0.5)] cursor-pointer relative max-w-[400px] w-full h-full text-left ${
+      className={`bg-white rounded-lg px-8 py-10 shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md hover:bg-[rgba(253,253,250,0.5)] cursor-pointer relative max-w-[400px] w-full h-full text-left text-[#C0C0C0] hover:text-primary ${
         disabled ? "opacity-50 cursor-not-allowed" : ""
       } ${className}`}
       {...props}

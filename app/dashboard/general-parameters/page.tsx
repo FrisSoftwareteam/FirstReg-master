@@ -1,8 +1,9 @@
 "use client";
 
-import Breadcrumb from "@/components/breadcrumb";
+// import Breadcrumb from "@/components/breadcrumb";
 import { useBreadcrumbNavigation } from "../../../hooks/useBreadcrumbNavigation";
 import ModuleCard from "@/components/module-card";
+// import Vector2 from "";
 
 export default function GeneralParameters() {
   const { navigateWithBreadcrumb } = useBreadcrumbNavigation();
@@ -49,7 +50,7 @@ export default function GeneralParameters() {
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
       <main className="px-6 py-8">
-        <Breadcrumb />
+        {/* <Breadcrumb /> */}
 
         <h1 className="text-4xl font-ubuntu mx-[28px] font-[500] text-primary mb-40">
           General Parameters
@@ -62,11 +63,18 @@ export default function GeneralParameters() {
               title={module.title}
               icon={
                 <div className="w-6 h-6">
-                  <img
-                    src={module.icon}
-                    alt={module.title}
-                    className="w-full h-1/2"
-                  />
+                  <svg
+                    width="24"
+                    height="11"
+                    viewBox="0 0 24 11"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M0 0H10.5V10.5H0V0ZM24 0H13.5V10.5H24V0Z"
+                      fill="currentColor"
+                    />
+                  </svg>
                 </div>
               }
               description={module.description}

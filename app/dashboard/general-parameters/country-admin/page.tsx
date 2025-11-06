@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/components/breadcrumb";
+// import Breadcrumb from "@/components/breadcrumb";
 import { useBreadcrumbNavigation } from "../../../../hooks/useBreadcrumbNavigation";
 import ModuleCard from "@/components/module-card";
 
@@ -46,7 +46,7 @@ export default function CountryAdmin() {
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
       <main className="px-6 py-8">
-        <Breadcrumb />
+        {/* <Breadcrumb /> */}
 
         <h1 className="text-4xl font-ubuntu mx-[28px] font-[500] text-primary mb-40">
           Country Administration
