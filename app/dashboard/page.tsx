@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/components/breadcrumb";
+// import Breadcrumb from "@/components/breadcrumb";
 import ModuleCard from "@/components/module-card";
 import { useBreadcrumbNavigation } from "../../hooks/useBreadcrumbNavigation";
 
@@ -48,7 +48,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
       <main className="px-6 py-8">
-        <Breadcrumb />
+        {/* <Breadcrumb /> */}
 
         <div className="mb-4 mx-[28px]">
           <span className="text-[#C10B0B] text-sm font-medium">
@@ -68,7 +68,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-[54px] gap-x-[98px] mx-[28px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-[54px] gap-x-[98px] mx-[28px] ">
           {modules.map((module, index) => (
             <ModuleCard
               key={module.title}
@@ -79,12 +79,24 @@ export default function Dashboard() {
                 navigateWithBreadcrumb(module.href, module.title.toUpperCase())
               }
               icon={
-                <div className="w-6 h-6">
-                  <img
+                <div className="w-6 h-6 ">
+                  {/* <img
                     src={module.icon}
                     alt={module.title}
                     className="w-full h-full"
-                  />
+                  /> */}
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M6.75 0H17.25V10.5H6.75V0ZM0 13.5H10.5V24H0V13.5ZM24 13.5H13.5V24H24V13.5Z"
+                      fill="currentColor"
+                    />
+                  </svg>
                 </div>
               }
               className={!module.href ? "opacity-50 cursor-not-allowed" : ""}

@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/components/ui/button";
 import { Checkbox } from "@/components/components/ui/checkbox";
 import { Mail, Phone } from "lucide-react";
-import Breadcrumb from "@/components/breadcrumb";
+// import Breadcrumb from "@/components/breadcrumb";
 
 export default function UserAdministration() {
   const [selectedUser, setSelectedUser] = useState("Emmanuel Effiong");
@@ -170,9 +170,9 @@ export default function UserAdministration() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#e8e8e8]">
+    <div className="min-h-screen bg-[#F2F2F2]">
       <main className="px-4 sm:px-6 md:px-10 lg:px-14 py-6 md:py-8">
-        <Breadcrumb />
+        {/* <Breadcrumb /> */}
         <h1 className=" mx-[0px] font-ubuntu font-500 mb-8 text-3xl text-primary">
           User Administration
         </h1>
@@ -193,7 +193,7 @@ export default function UserAdministration() {
             {/* Left: Avatar */}
             <div className="flex justify-center md:justify-start">
               <Avatar className="h-24 w-24 md:h-28 md:w-28 border-2 border-gray-200">
-                <AvatarImage src="/professional-business-person.png" />
+                <AvatarImage src="/profileT.jpg" />
                 <AvatarFallback className="bg-gray-100 text-lg font-semibold text-gray-600">
                   EE
                 </AvatarFallback>
@@ -239,10 +239,10 @@ export default function UserAdministration() {
             </div>
 
             {/* Right: User Details and Modify Button */}
-            <div className="flex flex-1 flex-col gap-6 h-full p-6">
-              <div className="flex gap-4 flex-wrap">
+            <div className="flex flex-1 flex-col gap-6 h-full p-1 md:p-6">
+              <div className="flex gap-6 flex-wrap">
                 {/* User Details */}
-                <div className="space-y-2 text-sm">
+                <div className="space-y-4 text-sm">
                   <div className="">
                     <p className="text-sm font-bold text-gray-600 tracking-wide">
                       DEPT: Information Technology
@@ -258,10 +258,10 @@ export default function UserAdministration() {
                 </div>
 
                 {/* Contact Details with Icons */}
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-blue-600" />
-                    <p className="text-sm font-bold text-primary overflow-hidden text-ellipsis md:overflow-visible max-w-[200px]">
+                    <p className="text-sm font-bold text-primary overflow-hidden text-ellipsis md:overflow-visible max-w-[280px]">
                       emmanuel.effiong@firstregistrarsnigeria.com
                     </p>
                   </div>

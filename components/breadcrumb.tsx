@@ -48,7 +48,7 @@ export default function Breadcrumb() {
 
   return (
     <>
-      <div className="px-4 sm:px-6 lg:px-8 py-4">
+      <div className="px-8 sm:px-10 lg:px-12 py-4 bg-[#F2F2F2]">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           {/* Back Button - Full width on mobile, auto on larger screens */}
           <button
@@ -67,7 +67,10 @@ export default function Breadcrumb() {
           <div className="w-full overflow-x-auto hide-scrollbar">
             <div className="flex items-center gap-1 sm:gap-2 min-w-max py-1">
               {breadcrumbs.map((item, index) => (
-                <div key={item.href} className="flex items-center gap-1 sm:gap-2">
+                <div
+                  key={item.href}
+                  className="flex items-center gap-1 sm:gap-2"
+                >
                   {index > 0 && (
                     <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
                   )}
@@ -94,11 +97,11 @@ export default function Breadcrumb() {
       </div>
       <style jsx global>{`
         .hide-scrollbar {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
         }
         .hide-scrollbar::-webkit-scrollbar {
-          display: none;  /* Chrome, Safari and Opera */
+          display: none; /* Chrome, Safari and Opera */
         }
       `}</style>
     </>

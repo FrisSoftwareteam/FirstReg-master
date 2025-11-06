@@ -3,6 +3,7 @@
 // import { ReduxProvider } from "@/lib/redux/ReduxProvider";
 // import { Ubuntu, Poppins } from "next/font/google";
 
+import Breadcrumb from "@/components/breadcrumb";
 import Header from "@/components/header";
 
 // const ubuntu = Ubuntu({
@@ -44,6 +45,7 @@ export default function RootLayout({
     // </html>
     <>
       <Header />
+      <Breadcrumb />
       {children}
     </>
   );
