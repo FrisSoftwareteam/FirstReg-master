@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import React from "react";
 
 interface ModuleCardProps extends React.HTMLAttributes<HTMLButtonElement> {
@@ -26,8 +27,9 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
       } ${className}`}
       {...props}
     >
-      <div className="flex gap-1 mb-4">
+      <div className="flex justify-between gap-1 mb-4">
         {icon ? icon : <div className="w-3 h-3 bg-primary" />}
+        <Check className="w-3 h-3 bg-primary rounded-full text-white" />
       </div>
       <h3 className="text-lg font-poppins font-[700] text-primary mb-3">
         {title}
