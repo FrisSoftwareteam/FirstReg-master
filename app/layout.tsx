@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ReduxProvider } from "@/lib/redux/ReduxProvider";
 import { Ubuntu, Poppins } from "next/font/google";
@@ -21,10 +21,22 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Project T",
-  description: "Next.js + RTK + RTK Query + Persist + Tailwind + shadcn/ui + Zod",
+  description: "Project T",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
