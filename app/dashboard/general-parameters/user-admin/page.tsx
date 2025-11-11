@@ -181,7 +181,7 @@ export default function UserAdministration() {
           {filterButtons.map((btn) => (
             <button
               key={btn}
-              className="whitespace-nowrap rounded-full border border-gray-400 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
+              className="whitespace-nowrap rounded-full border border-gray-400 px-4 py-2 text-[10px] text-gray-700 transition hover:bg-gray-50 sm:text-sm"
             >
               {btn}
             </button>
@@ -275,7 +275,7 @@ export default function UserAdministration() {
               </div>
 
               {/* Modify Button */}
-              <Button className="mt-4 w-full rounded-full bg-gray-900 py-6 text-base font-semibold text-white hover:bg-gray-800 transition md:mt-auto">
+              <Button className="mt-4 w-full rounded-full bg-gray-900 py-5 md:py-6 text-base font-normal text-white hover:bg-gray-800 transition md:mt-auto md:font-semibold">
                 Modify User
               </Button>
             </div>

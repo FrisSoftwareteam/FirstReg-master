@@ -56,7 +56,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 sm:px-6 lg:px-8">
+    <header className="bg-white border-b border-gray-200 px-4 py-3 sm:px-6 lg:px-8 max-h-[80px]">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="text-xl sm:text-2xl font-ubuntu font-[500] text-gray-900">
@@ -83,8 +83,8 @@ export default function Header() {
             <div
               className={`flex items-center gap-2 sm:gap-3 cursor-pointer rounded-t-lg transition-all duration-200 ${
                 isOpen
-                  ? "bg-white px-3 pt-3 pb-2 -mb-1 rounded-b-none shadow-sm"
-                  : ""
+                  ? "bg-white px-1 pb-2 -mb-2 rounded-b-none shadow-md"
+                  : "px-1"
               }`}
               onClick={isMobile ? handleProfileInteraction : undefined}
             >

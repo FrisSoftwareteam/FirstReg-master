@@ -16,11 +16,11 @@ export default function Dashboard() {
       href: "/dashboard/general-parameters",
     },
     {
-      title: "Processes",
+      title: "Shareholder Management",
       description:
         "Manage holders, certificates, and shareholder updates. Handle consolidations, splits, dividends, correspondence, and reports",
       icon: "/Vector.png",
-      href: "/dashboard/processes",
+      href: "/dashboard/shareholdermanagement",
     },
     {
       title: "Enquiries",
