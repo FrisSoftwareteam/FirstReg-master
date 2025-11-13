@@ -52,7 +52,7 @@ export default function GeneralParameters() {
       <main className="px-6 py-8">
         {/* <Breadcrumb /> */}
 
-        <h1 className="text-4xl font-ubuntu mx-[28px] font-[500] text-primary mb-40">
+        <h1 className="text-4xl font-ubuntu mx-[28px] font-[500] text-primary mb-10 sm:mb-40">
           General Parameters
         </h1>
 
