@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, GitBranch, TrendingUp } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ShareholderTabsProps {
@@ -19,7 +19,7 @@ export function ShareholderTabs({
     { id: "certificate", label: "Certificate" },
     { id: "dividend", label: "Dividend" },
     { id: "linked", label: "Linked Holders" },
-    { id: "probates", label: "Probates" },
+    { id: "probates", label: "Probate Administrators" },
   ];
 
   const renderContent = () => {
@@ -121,14 +121,14 @@ function HoldingsContent({ shareholder }: { shareholder: any }) {
   return (
     <div className="space-y-6">
       <div className="flex gap-3 flex-wrap">
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full">
           <Plus className="w-4 h-4" />
           Link New Register
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full">
           Merge Account
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full">
           Demerge Account
         </Button>
       </div>
@@ -164,25 +164,25 @@ function CertificateContent() {
   return (
     <div className="space-y-6">
       <div className="flex gap-3 flex-wrap">
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2">
+        {/* <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full">
           <Plus className="w-4 h-4" />
           Add New
-        </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50">
+        </Button> */}
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
           Update
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
           Amalgamate
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
           Split
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
           Bonus Script
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50">
+        {/* <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
           Probate Administration
-        </Button>
+        </Button> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -209,21 +209,21 @@ function CertificateContent() {
 function DividendContent() {
   return (
     <div className="space-y-6">
-      <div className="flex gap-3 flex-wrap">
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2">
+      {/* <div className="flex gap-3 flex-wrap">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full">
           <Plus className="w-4 h-4" />
           Declare Dividend
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
           Revalidate
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
           Annotation
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50">
+        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
           Correspondence
         </Button>
-      </div>
+      </div> */}
 
       <div className="overflow-x-auto border rounded-lg">
         <table className="w-full">
@@ -266,10 +266,10 @@ function LinkedHoldersContent() {
   return (
     <div className="space-y-6">
       <div className="flex gap-3">
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2">
+        {/* <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2">
           <Plus className="w-4 h-4" />
           Link New Holder
-        </Button>
+        </Button> */}
       </div>
       <p className="text-gray-600 text-sm">No linked holders found</p>
     </div>
@@ -280,10 +280,10 @@ function ProbatesContent() {
   return (
     <div className="space-y-6">
       <div className="flex gap-3">
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2">
+        {/* <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2">
           <TrendingUp className="w-4 h-4" />
           View Probates
-        </Button>
+        </Button> */}
       </div>
       <p className="text-gray-600 text-sm">No probate records found</p>
     </div>
