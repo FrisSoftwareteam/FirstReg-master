@@ -153,14 +153,14 @@ export function SearchModal({ onSelectShareholder }: SearchModalProps) {
             {searchTerm && (
               <button
                 onClick={clearSearch}
-                className="absolute right-32 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
               </button>
             )}
-            <button className="absolute right-3 top-1/2 transform -translate-y-1/2 px-8 py-3 bg-primary text-white font-medium hidden md:flex rounded-full">
+            {/* <button className="absolute right-3 top-1/2 transform -translate-y-1/2 px-8 py-3 bg-primary text-white font-medium hidden md:flex rounded-full">
               Search
-            </button>
+            </button> */}
           </div>
         </div>
 
