@@ -108,7 +108,7 @@ function ShareholderPage({ shareholder, onBack }: ShareholderPageProps) {
                 {
                   // currentShareholder &&
                   <div className="bg-white rounded-lg p-4 md:p-4 md:min-w-fit shadow md:w-full">
-                    <div className=" flex flex-col gap-2">
+                    <div className="flex flex-col gap-2">
                       <div>
                         <p className="text-gray-500 text-sm font-medium">
                           Holder No:{" "}

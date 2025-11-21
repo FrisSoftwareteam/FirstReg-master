@@ -9,18 +9,18 @@ export default function Dashboard() {
 
   const modules = [
     {
-      title: "General Parameters",
+      title: "User Administration",
       description:
-        "Control users, registers, holders, and agents. Configure countries, correspondence, and admin settings",
+        "Manage and control user access, roles and permission  with ease.",
       icon: "/Vector.png",
-      href: "/dashboard/general-parameters",
+      href: "/dashboard/user-admin",
     },
     {
       title: "Shareholder Management",
       description:
         "Manage holders, certificates, and shareholder updates. Handle consolidations, splits, dividends, correspondence, and reports",
       icon: "/Vector.png",
-      href: "/dashboard/shareholdermanagement",
+      href: "/dashboard/shareholder-management",
     },
     {
       title: "Enquiries",
