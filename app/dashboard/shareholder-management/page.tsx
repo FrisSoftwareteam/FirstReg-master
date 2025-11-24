@@ -87,14 +87,14 @@ function ShareholderPage({ shareholder, onBack }: ShareholderPageProps) {
           </div>
 
           {/* Selector Section - Stacked on mobile */}
-          <div className="rounded-lg mb-4 md:mb-8 md:h-[15vh]">
+          <div className="rounded-lg mb-4 md:mb-8 md:h-[15vh] md:min-h-[15vh]">
             <div className="flex flex-col md:flex-row md:gap-8 md:items-center gap-4 w-full justify-between h-full">
               {/* Avatar */}
               <div className="flex gap-4 w-full md:w-1/2 items-center h-full">
                 <div className="w-16 h-16 md:w-36 md:h-36 rounded-full bg-gray-200 flex items-center justify-center mx-auto md:mx-0">
                   <Users className="w-8 h-8 md:w-12 md:h-12 text-gray-400" />
                 </div>
-                <div className="w-3/4 md:w-3/4 shadow p-4 bg-white h-full flex items-center rounded-lg">
+                <div className="w-3/4 md:w-3/4 shadow p-4 bg-white h-full flex items-center rounded-lg min-h-fit">
                   <ShareholderSelector
                     currentShareholder={currentShareholder}
                     onSelectShareholder={setCurrentShareholder}
@@ -107,45 +107,45 @@ function ShareholderPage({ shareholder, onBack }: ShareholderPageProps) {
                 {/* Info Display - Full width on mobile, side by side on desktop */}
                 {
                   // currentShareholder &&
-                  <div className="bg-white rounded-lg p-4 md:p-4 md:min-w-fit shadow md:w-full">
-                    <div className="flex flex-col gap-2">
-                      <div>
-                        <p className="text-gray-500 text-sm font-medium">
-                          Holder No:{" "}
-                          <span className="font-semibold text-slate-900 truncate">
-                            {" "}
-                            4
-                          </span>
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 text-sm font-medium">
-                          Total No of Holdings:{" "}
-                          <span className="font-semibold text-slate-900 truncate">
-                            {" "}
-                            10
-                          </span>
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 text-sm font-medium">
-                          Company/Registers:{" "}
-                          <span className="font-semibold text-slate-900 truncate">
-                            {" "}
-                            Oando
-                          </span>
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 text-sm font-medium">
-                          Clearing House Number:{" "}
-                          <span className="font-semibold text-slate-900 truncate">
-                            {" "}
-                            253738464
-                          </span>
-                        </p>
-                      </div>
+                  <div className="bg-white rounded-lg p-4 md:p-4 md:min-w-fit shadow md:w-full flex flex-col gap-2 min-h-fit">
+                    {/* <div className="flex flex-col "> */}
+                    <div>
+                      <p className="text-gray-500 text-sm font-medium">
+                        Holder No:{" "}
+                        <span className="font-semibold text-slate-900 truncate">
+                          {" "}
+                          4
+                        </span>
+                      </p>
                     </div>
+                    <div>
+                      <p className="text-gray-500 text-sm font-medium">
+                        Total No of Holdings:{" "}
+                        <span className="font-semibold text-slate-900 truncate">
+                          {" "}
+                          10
+                        </span>
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm font-medium">
+                        Company/Registers:{" "}
+                        <span className="font-semibold text-slate-900 truncate">
+                          {" "}
+                          Oando
+                        </span>
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm font-medium">
+                        Clearing House Number:{" "}
+                        <span className="font-semibold text-slate-900 truncate">
+                          {" "}
+                          253738464
+                        </span>
+                      </p>
+                    </div>
+                    {/* </div> */}
                   </div>
                 }
               </div>
