@@ -19,12 +19,12 @@ export function ShareholderInfo({
       {/* Personal Information */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-slate-900">
+          <h3 className="text-lg font-bold text-[#0F2763] font-ubuntu">
             Personal Information
           </h3>
           <Button
             onClick={onEditPersonal}
-            className="border border-gray-300 bg-white text-slate-900 hover:bg-gray-50 gap-2 px-6"
+            className="border border-gray-300 bg-white text-slate-900 hover:bg-gray-50 gap-2 px-6 rounded-full"
           >
             <Edit2 className="w-4 h-4" />
             Edit
@@ -61,12 +61,12 @@ export function ShareholderInfo({
       {/* Bank Mandates */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-slate-900">
+          <h3 className="text-lg font-bold text-[#0F2763] font-ubuntu">
             Bank Mandates (E-Dividend)
           </h3>
           <Button
             onClick={onEditBank}
-            className="border border-gray-300 bg-white text-slate-900 hover:bg-gray-50 gap-2 px-6"
+            className="border border-gray-300 bg-white text-slate-900 hover:bg-gray-50 gap-2 px-6 rounded-full"
           >
             <Edit2 className="w-4 h-4" />
             Edit

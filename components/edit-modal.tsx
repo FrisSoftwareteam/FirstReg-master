@@ -29,10 +29,10 @@ export function EditModal({ type, shareholder, onClose }: EditModalProps) {
   if (type === "personal") {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-10">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-border">
-            <h2 className="text-xl font-bold text-foreground">
+          <div className="flex items-center justify-between p-6">
+            <h2 className="text-xl font-bold text-foreground font-ubuntu w-full text-center">
               Edit Shareholder Personal Information
             </h2>
             <button
@@ -44,7 +44,7 @@ export function EditModal({ type, shareholder, onClose }: EditModalProps) {
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-6 bg-[#F2F2F2] rounded-2xl ">
             <h3 className="text-lg font-semibold text-foreground mb-6">
               Edit Personal Information
             </h3>
@@ -184,23 +184,25 @@ export function EditModal({ type, shareholder, onClose }: EditModalProps) {
             </div>
 
             {/* File Upload */}
-            <div className="mb-6 p-4 border-2 border-dashed border-border rounded-lg text-center">
-              <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm font-medium text-foreground">
-                Upload Shareholder's Request
-              </p>
-              <p className="text-xs text-muted-foreground">JPG, JPEG, PNG</p>
+            <div className="mb-6 border-2 border-b bg-white text-center p-6 rounded-3xl">
+              <div className="mb-6 p-4 border-2 border-dashed border-black bg-[#F2F2F2] rounded-3xl text-center">
+                <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm font-medium text-foreground">
+                  Upload Shareholder's Request
+                </p>
+                <p className="text-xs text-muted-foreground">JPG, JPEG, PNG</p>
+              </div>
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-3">
-              <Button
+            <div className="flex gap-3 w-full justify-center">
+              {/* <Button
                 onClick={onClose}
                 className="flex-1 bg-white border border-input text-foreground hover:bg-muted"
               >
                 Cancel
-              </Button>
-              <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+              </Button> */}
+              <Button className="bg-[#0F2763] w-[50%] text-primary-foreground rounded-full hover:bg-primary/90">
                 Save
               </Button>
             </div>
@@ -212,10 +214,10 @@ export function EditModal({ type, shareholder, onClose }: EditModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl p-10">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <h2 className="text-xl font-bold text-foreground">
+        <div className="flex items-center justify-between p-6">
+          <h2 className="text-xl font-bold text-foreground w-full text-center font-ubuntu">
             Edit Shareholder's Bank Mandate (E-Dividend)
           </h2>
           <button
@@ -227,7 +229,7 @@ export function EditModal({ type, shareholder, onClose }: EditModalProps) {
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-6 bg-[#F2F2F2] rounded-2xl">
           <h3 className="text-lg font-semibold text-foreground mb-6">
             Bank Mandate
           </h3>
@@ -278,19 +280,12 @@ export function EditModal({ type, shareholder, onClose }: EditModalProps) {
               </select>
             </div>
           </div>
-
-          {/* Buttons */}
-          <div className="flex gap-3">
-            <Button
-              onClick={onClose}
-              className="flex-1 bg-white border border-input text-foreground hover:bg-muted"
-            >
-              Cancel
-            </Button>
-            <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
-              Save
-            </Button>
-          </div>
+        </div>
+        {/* Buttons */}
+        <div className="flex gap-3 mt-4 w-full justify-center">
+          <Button className="bg-[#0F2763] w-[50%] text-primary-foreground hover:bg-primary/90 rounded-full">
+            Save
+          </Button>
         </div>
       </div>
     </div>

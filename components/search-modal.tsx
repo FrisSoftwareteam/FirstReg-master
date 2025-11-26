@@ -4,15 +4,21 @@ import type React from "react";
 
 import { useState } from "react";
 import { Search, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface SearchModalProps {
   onSelectShareholder: (shareholder: any) => void;
+  setShowSearch: (val: boolean) => void;
 }
 
-export function SearchModal({ onSelectShareholder }: SearchModalProps) {
+export function SearchModal({
+  onSelectShareholder,
+  setShowSearch,
+}: SearchModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const router = useRouter();
 
   const mockShareholders = [
     {
@@ -124,22 +130,33 @@ export function SearchModal({ onSelectShareholder }: SearchModalProps) {
     setHasSearched(false);
   };
 
+  const onClose = () => {
+    setShowSearch(false);
+    router.push("/dashboard");
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-[#FAF9F6] rounded-2xl shadow-lg p-8 w-[90vw] md:w-[70vw] max-h-[80vh] overflow-y-auto min-h-[60vh]">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+      <div className="bg-[#FAF9F6] rounded-2xl shadow-lg p-6 md:p-10 w-[90vw] md:w-[70vw] max-h-[80vh] overflow-y-auto min-h-[60vh]">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
             Welcome to Shareholder Management
           </h1>
           <p className="text-gray-600">
             Search/ Select a Shareholder to Continue
           </p>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground absolute right-0.5 md:right-6 top-0.5 md:top-6"
+          >
+            <X className="w-6 h-6 font-bold" />
+          </button>
         </div>
 
         {/* Search Input */}
-        <div className="flex gap-2 mb-6 items-center">
-          <div className="relative flex-1">
+        <div className="flex gap-2 mb-6 items-center justify-center">
+          <div className="relative w-[70%] flex justify-center">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
@@ -175,7 +192,7 @@ export function SearchModal({ onSelectShareholder }: SearchModalProps) {
             </p>
 
             {searchResults.length > 0 ? (
-              <div className="overflow-x-auto border rounded-lg bg-gray-50">
+              <div className="overflow-x-auto border rounded-lg bg-[#F2F2F2]">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b bg-gray-100">
