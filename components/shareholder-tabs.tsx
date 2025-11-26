@@ -7,12 +7,24 @@ interface ShareholderTabsProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   shareholder: any;
+  onLinkNewRegister?: () => void;
+  onMergeAccount?: () => void;
+  onLinkJointHolder?: () => void;
+  onAmalgamate?: () => void;
+  onCertificateSplit?: () => void;
+  onCertificateUpdate?: () => void;
 }
 
 export function ShareholderTabs({
   activeTab,
   onTabChange,
   shareholder,
+  onLinkNewRegister,
+  onMergeAccount,
+  onLinkJointHolder,
+  onAmalgamate,
+  onCertificateSplit,
+  onCertificateUpdate,
 }: ShareholderTabsProps) {
   const tabs = [
     { id: "holdings", label: "Holdings" },
@@ -25,9 +37,21 @@ export function ShareholderTabs({
   const renderContent = () => {
     switch (activeTab) {
       case "holdings":
-        return <HoldingsContent shareholder={shareholder} />;
+        return (
+          <HoldingsContent
+            shareholder={shareholder}
+            onLinkNewRegister={onLinkNewRegister}
+            onMergeAccount={onMergeAccount}
+          />
+        );
       case "certificate":
-        return <CertificateContent />;
+        return (
+          <CertificateContent
+            onAmalgamate={onAmalgamate}
+            onCertificateSplit={onCertificateSplit}
+            onCertificateUpdate={onCertificateUpdate}
+          />
+        );
       case "dividend":
         return <DividendContent />;
       case "linked":
@@ -86,7 +110,15 @@ export function ShareholderTabs({
   );
 }
 
-function HoldingsContent({ shareholder }: { shareholder: any }) {
+function HoldingsContent({
+  shareholder,
+  onLinkNewRegister,
+  onMergeAccount,
+}: {
+  shareholder: any;
+  onLinkNewRegister?: () => void;
+  onMergeAccount?: () => void;
+}) {
   const holdings = [
     {
       name: "Nigeria Breweries PLC",
@@ -121,11 +153,17 @@ function HoldingsContent({ shareholder }: { shareholder: any }) {
   return (
     <div className="space-y-6">
       <div className="flex gap-3 flex-wrap">
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full">
+        <Button
+          onClick={onLinkNewRegister}
+          className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full"
+        >
           <Plus className="w-4 h-4" />
           Link New Register
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full">
+        <Button
+          onClick={onMergeAccount}
+          className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full"
+        >
           Merge Account
         </Button>
         <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 gap-2 rounded-full">
@@ -160,7 +198,15 @@ function HoldingsContent({ shareholder }: { shareholder: any }) {
   );
 }
 
-function CertificateContent() {
+function CertificateContent({
+  onAmalgamate,
+  onCertificateSplit,
+  onCertificateUpdate,
+}: {
+  onAmalgamate?: () => void;
+  onCertificateSplit?: () => void;
+  onCertificateUpdate?: () => void;
+}) {
   return (
     <div className="space-y-6">
       <div className="flex gap-3 flex-wrap">
@@ -168,16 +214,25 @@ function CertificateContent() {
           <Plus className="w-4 h-4" />
           Add New
         </Button> */}
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
+        <Button
+          onClick={onCertificateUpdate}
+          className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 text-xs md:text-sm px-3 md:px-4 py-2 rounded-full"
+        >
           Update
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
+        <Button
+          onClick={onAmalgamate}
+          className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 text-xs md:text-sm px-3 md:px-4 py-2 rounded-full"
+        >
           Amalgamate
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
+        <Button
+          onClick={onCertificateSplit}
+          className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 text-xs md:text-sm px-3 md:px-4 py-2 rounded-full"
+        >
           Split
         </Button>
-        <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
+        <Button className="bg-white border border-gray-200 text-slate-300 hover:bg-gray-50 rounded-full">
           Bonus Script
         </Button>
         {/* <Button className="bg-white border border-gray-300 text-slate-900 hover:bg-gray-50 rounded-full">
