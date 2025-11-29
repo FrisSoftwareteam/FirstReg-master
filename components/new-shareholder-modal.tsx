@@ -2,12 +2,38 @@
 
 import { X, MapPin, User, Mail, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface NewShareholderModalProps {
   onClose: () => void;
+  addModal?: boolean;
+  setAddModal?: (a: boolean) => void;
 }
 
-export function NewShareholderModal({ onClose }: NewShareholderModalProps) {
+export function NewShareholderModal({
+  onClose,
+  addModal,
+  setAddModal,
+}: NewShareholderModalProps) {
+  const router = useRouter();
+
+  const closeModal = () => {
+    console.log(addModal);
+    if (setAddModal) {
+      if (addModal === true) {
+        console.log("top", addModal);
+        setAddModal(false);
+        router.push("/dashboard");
+      } else {
+        console.log("down", addModal);
+        onClose();
+      }
+    } else {
+      console.log("down", addModal);
+      onClose();
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white rounded-3xl shadow-lg w-full max-w-[90vw] max-h-[90vh] overflow-y-auto my-8 py-4">
@@ -23,7 +49,7 @@ export function NewShareholderModal({ onClose }: NewShareholderModalProps) {
             </p>
           </div>
           <button
-            onClick={onClose}
+            onClick={closeModal}
             className="text-slate-500 hover:text-slate-900"
           >
             <X className="w-6 h-6" />
