@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SearchModal } from "@/components/search-modal";
 import { ArrowLeft, Plus, AlertTriangle, FileText, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,10 +16,15 @@ import { LinkJointHolderModal } from "@/components/link-joint-holder-modal";
 import { AmalgamateModal } from "@/components/amalgamate-modal";
 import { CertificateSplitModal } from "@/components/certificate-split-modal";
 import { CertificateUpdateModal } from "@/components/certificate-update-modal";
+import { ShareholderManagementModal } from "@/components/shareholderManagementProps";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [selectedShareholder, setSelectedShareholder] = useState<any>(null);
-  const [showSearch, setShowSearch] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
+  const [askModal, setAskModal] = useState(true);
+  const [addModal, setAddModal] = useState(false);
+  const router = useRouter();
 
   const handleSelectShareholder = (shareholder: any) => {
     setSelectedShareholder(shareholder);
@@ -30,19 +35,50 @@ const page = () => {
     setShowSearch(true);
     setSelectedShareholder(null);
   };
+
+  const onCreateNew = () => {
+    setAddModal(true);
+    setAskModal(false);
+    setShowSearch(false);
+  };
+
+  const onSearchExisting = () => {
+    setShowSearch(true);
+    setAddModal(false);
+    setAskModal(false);
+  };
+
+  const onClose = () => {
+    setAskModal(false);
+    router.push("/dashboard");
+  };
+
   return (
     <div className="min-h-screen">
-      {showSearch ? (
+      {showSearch === true && askModal === false && addModal === false ? (
         <SearchModal
           onSelectShareholder={handleSelectShareholder}
           setShowSearch={setShowSearch}
         />
-      ) : (
+      ) : showSearch === false && askModal === false && addModal === false ? (
         <ShareholderPage
           shareholder={selectedShareholder}
           onBack={handleBackToSearch}
+          setAddModal={setAddModal}
         />
-      )}
+      ) : showSearch === false && askModal === true && addModal === false ? (
+        <ShareholderManagementModal
+          onCreateNew={onCreateNew}
+          onSearchExisting={onSearchExisting}
+          onClose={onClose}
+        />
+      ) : showSearch === false && askModal === false && addModal === true ? (
+        <NewShareholderModal
+          onClose={() => setAddModal(false)}
+          addModal={addModal}
+          setAddModal={setAddModal}
+        />
+      ) : null}
     </div>
   );
 };
@@ -52,9 +88,14 @@ export default page;
 interface ShareholderPageProps {
   shareholder: any;
   onBack: () => void;
+  setAddModal: (a: boolean) => void;
 }
 
-function ShareholderPage({ shareholder, onBack }: ShareholderPageProps) {
+function ShareholderPage({
+  shareholder,
+  onBack,
+  setAddModal,
+}: ShareholderPageProps) {
   const [currentShareholder, setCurrentShareholder] = useState(shareholder);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editType, setEditType] = useState<"personal" | "bank" | null>(null);
@@ -73,6 +114,10 @@ function ShareholderPage({ shareholder, onBack }: ShareholderPageProps) {
     setEditType(type);
     setEditModalOpen(true);
   };
+
+  useEffect(() => {
+    setAddModal(false);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
@@ -362,7 +407,10 @@ function ShareholderPage({ shareholder, onBack }: ShareholderPageProps) {
 
       {cautionOpen && <CautionModal onClose={() => setCautionOpen(false)} />}
       {newShareholderOpen && (
-        <NewShareholderModal onClose={() => setNewShareholderOpen(false)} />
+        <NewShareholderModal
+          onClose={() => setNewShareholderOpen(false)}
+          addModal={false}
+        />
       )}
       {mergeAccountOpen && (
         <MergeAccountModal onClose={() => setMergeAccountOpen(false)} />
