@@ -5,13 +5,23 @@ var THEMETAGS = THEMETAGS || {};
 
     $(window).ready(function () {
         $('#preloader').delay(100).fadeOut('fade');
-    }); //dropdown menu hover js
+    });
 
-    $('ul.nav li.dropdown').hover(function () {
-        $(this).find('.dropdown-menu').stop(true, true).delay(100).fadeIn(200);
-    }, function () {
-        $(this).find('.dropdown-menu').stop(true, true).delay(100).fadeOut(200);
-    }); //sticky header
+    // ensure dropdowns work on click (desktop browsers were ignoring hover)
+    document.querySelectorAll('.dropdown-toggle').forEach(function (trigger) {
+        bootstrap.Dropdown.getOrCreateInstance(trigger);
+    });
+
+    // optional hover support for large screens without breaking click toggle
+    if (window.matchMedia('(min-width: 992px)').matches) {
+        $('ul.nav li.dropdown').hover(function () {
+            var toggle = $(this).find('.dropdown-toggle')[0];
+            bootstrap.Dropdown.getOrCreateInstance(toggle).show();
+        }, function () {
+            var toggle = $(this).find('.dropdown-toggle')[0];
+            bootstrap.Dropdown.getOrCreateInstance(toggle).hide();
+        });
+    } //sticky header
 
     $(window).on('scroll', function () {
         var scroll = $(window).scrollTop();

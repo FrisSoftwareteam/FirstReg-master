@@ -145,7 +145,7 @@
                         <ul class="nav col-12 col-md-auto justify-content-center main-menu">
                             <li><a href="/" class="nav-link">Home</a></li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Who we Are
                                 </a>
                                 <div class="dropdown-menu border-0 rounded-custom shadow py-0 bg-white">
@@ -171,7 +171,7 @@
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     What we do
                                 </a>
                                 <div class="dropdown-menu border-0 rounded-custom shadow py-0 bg-white">
@@ -202,7 +202,7 @@
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     e-Products
                                 </a>
                                 <div class="dropdown-menu border-0 rounded-custom shadow py-0 bg-white">
@@ -234,7 +234,7 @@
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Resources
                                 </a>
                                 <div class="dropdown-menu border-0 rounded-custom shadow py-0 bg-white">
@@ -292,7 +292,7 @@
                             <ul class="nav col-12 col-md-auto justify-content-center main-menu">
                                 <li><a href="/" class="nav-link">Home</a></li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Who we Are
                                     </a>
                                     <div class="dropdown-menu border-0 rounded-custom shadow py-0 bg-white">
@@ -318,7 +318,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         What we do
                                     </a>
                                     <div class="dropdown-menu border-0 rounded-custom shadow py-0 bg-white">
@@ -349,7 +349,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         e-Products
                                     </a>
                                     <div class="dropdown-menu border-0 rounded-custom shadow py-0 bg-white">
@@ -382,7 +382,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Resources
                                     </a>
                                     <div class="dropdown-menu border-0 rounded-custom shadow py-0 bg-white">
@@ -535,12 +535,25 @@
     </div>
 
     <!--build:js-->
-    <script src="/assets/js/vendors/jquery-3.6.0.min.js"></script>
-    <script src="/assets/js/vendors/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/vendors/swiper-bundle.min.js"></script>
-    <script src="/assets/js/vendors/jquery.magnific-popup.min.js"></script>
-    <script src="/assets/js/vendors/parallax.min.js"></script>
-    <script src="/assets/js/vendors/aos.js"></script>
+    <!-- Load core vendor scripts from CDN with local fallbacks to keep menus working even if packaged assets are missing -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="/assets/js/vendors/jquery-3.6.0.min.js"><\\/script>');</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>if (typeof bootstrap === 'undefined') { document.write('<script src="/assets/js/vendors/bootstrap.bundle.min.js"><\\/script>'); }</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <script>if (typeof Swiper === 'undefined') { document.write('<script src="/assets/js/vendors/swiper-bundle.min.js"><\\/script>'); }</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/jquery.magnific-popup.min.js"></script>
+    <script>if (!$.magnificPopup) { document.write('<script src="/assets/js/vendors/jquery.magnific-popup.min.js"><\\/script>'); }</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/parallax-js@3.1.0/dist/parallax.min.js"></script>
+    <script>if (typeof Parallax === 'undefined') { document.write('<script src="/assets/js/vendors/parallax.min.js"><\\/script>'); }</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>if (typeof AOS === 'undefined') { document.write('<script src="/assets/js/vendors/aos.js"><\\/script>'); }</script>
+
     <script src="/assets/js/app.js" asp-append-version="true"></script>
     <!--endbuild-->
 
