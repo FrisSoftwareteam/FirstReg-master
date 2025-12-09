@@ -19,6 +19,15 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>;
 
+const MicrosoftLogo = () => (
+  <span className="grid grid-cols-2 grid-rows-2 gap-[2px] h-5 w-5">
+    <span className="bg-[#F25022]" />
+    <span className="bg-[#7FBA00]" />
+    <span className="bg-[#00A4EF]" />
+    <span className="bg-[#FFB900]" />
+  </span>
+);
+
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
@@ -44,6 +53,20 @@ export default function LoginPage() {
     ...passwordFieldProps
   } = register("password");
 
+  const microsoftSignInUrl = "/api/auth/microsoft";
+
+  const handleMicrosoftSignIn = () => {
+    setIsLoading(true);
+    try {
+      // Hard redirect to avoid client routing issues.
+      // window.location.assign(microsoftSignInUrl);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Microsoft sign-in failed to start:", error);
+      setIsLoading(false);
+    }
+  };
+
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     // Simulate API call
@@ -55,134 +78,211 @@ export default function LoginPage() {
   };
 
   return (
+    // <div
+    //   className="min-h-screen bg-white bg-cover bg-center bg-no-repeat"
+    //   style={{
+    //     backgroundImage: "url('/login.png')",
+    //   }}
+    // >
+    //   <div className="min-h-screen flex bg-[rgba(255,255,255,0.5)]">
+    //     {/* Left side - Login Form */}
+    //     <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    //       <div className="w-full max-w-[650px] bg-white rounded shadow-lg border border-gray-100 py-12 px-8 space-y-6 min-h-[55vh]">
+    //         <div className="text-center space-y-2 mt-16 lg:mt-0 mb-10">
+    //           <h1 className="text-3xl font-ubuntu font-[500] text-textBlack text-balance">
+    //             Welcome to E-Stock
+    //           </h1>
+    //           <p className="text-[18px] text-textBlack font-poppins">
+    //             Please enter your official email details to sign in
+    //           </p>
+    //         </div>
+
+    //         {/* Form */}
+    //         <form
+    //           onSubmit={handleSubmit(onSubmit)}
+    //           className="space-y-4 flex flex-col gap-4"
+    //         >
+    //           <div className="space-y-1">
+    //             <Label htmlFor="email" className="sr-only">
+    //               Email Address
+    //             </Label>
+    //             <div className="relative">
+    //               <Mail
+    //                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-4 w-4 fill-[#5A5A5A]"
+    //                 fill="currentColor"
+    //               />
+    //               <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-6 w-[0.5px] bg-[#a8a7a7]"></div>
+    //               <Input
+    //                 id="email"
+    //                 type="email"
+    //                 placeholder="Email Address"
+    //                 className="pl-10 h-12 bg-[#F2F2F2] border border-gray-200 focus:border-gray-300 focus:ring-0 text-sm placeholder:text-gray-400"
+    //                 {...register("email")}
+    //               />
+    //             </div>
+    //             {errors.email && (
+    //               <p className="text-xs text-red-600">{errors.email.message}</p>
+    //             )}
+    //           </div>
+
+    //           <div className="space-y-1">
+    //             <Label htmlFor="password" className="sr-only">
+    //               Password
+    //             </Label>
+    //             <div className="relative">
+    //               <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5A5A5A] h-4 w-4" />
+    //               <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-6 w-[0.5px] bg-[#a8a7a7]"></div>
+    //               <Input
+    //                 id="password"
+    //                 type={isPasswordVisible ? "text" : "password"}
+    //                 placeholder="Password"
+    //                 className="pl-10 h-12 bg-[#F2F2F2] border border-gray-200 focus:border-gray-300 focus:ring-0 text-sm placeholder:text-gray-400"
+    //                 onFocus={() => setIsPasswordFocused(true)}
+    //                 onBlur={(e) => {
+    //                   setIsPasswordFocused(false);
+    //                   rhfPasswordOnBlur(e);
+    //                 }}
+    //                 ref={passwordRef}
+    //                 {...passwordFieldProps}
+    //               />
+    //               {isPasswordFocused && (
+    //                 <button
+    //                   type="button"
+    //                   aria-label={
+    //                     isPasswordVisible ? "Hide password" : "Show password"
+    //                   }
+    //                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5A5A5A]"
+    //                   onMouseDown={(e) => e.preventDefault()}
+    //                   onClick={() => setIsPasswordVisible((v) => !v)}
+    //                 >
+    //                   {isPasswordVisible ? (
+    //                     <EyeOff className="h-4 w-4" />
+    //                   ) : (
+    //                     <Eye className="h-4 w-4" />
+    //                   )}
+    //                 </button>
+    //               )}
+    //             </div>
+    //             {errors.password && (
+    //               <p className="text-xs text-red-600">
+    //                 {errors.password.message}
+    //               </p>
+    //             )}
+    //           </div>
+
+    //           <div className="flex items-center justify-between">
+    //             <div className="flex items-center space-x-2">
+    //               <Checkbox
+    //                 id="rememberMe"
+    //                 checked={rememberMe}
+    //                 onCheckedChange={(checked) =>
+    //                   setValue("rememberMe", !!checked)
+    //                 }
+    //                 className="h-4 w-4"
+    //               />
+    //               <Label
+    //                 htmlFor="rememberMe"
+    //                 className="text-sm text-gray-700 font-normal"
+    //               >
+    //                 Remember me
+    //               </Label>
+    //             </div>
+    //             {/* <button
+    //               type="button"
+    //               className="text-sm text-gray-600 hover:text-gray-900 underline"
+    //             >
+    //               Forgot Password?
+    //             </button> */}
+    //           </div>
+
+    //           <div className="pt-4">
+    //             <Button
+    //               type="submit"
+    //               className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-full text-sm"
+    //               disabled={isLoading}
+    //             >
+    //               {isLoading ? "Signing in..." : "Sign in"}{" "}
+    //               <User className="ml-2 text-[#F2F2F2]" size={16} />
+    //             </Button>
+    //           </div>
+    //         </form>
+    //       </div>
+    //     </div>
+
+    //     {/* Right side - Marketing Content */}
+    //     <div className="hidden lg:flex flex-1 items-center justify-start px-8 xl:px-16">
+    //       <div className="max-w-md space-y-8">
+    //         <div className="space-y-6">
+    //           <h2 className="text-[40px] font-ubuntu font-[500] text-primaryDarkText leading-tight text-balance mb-11">
+    //             Solution For The
+    //             <br />
+    //             Registrars Industry
+    //           </h2>
+    //           <p className="font-ubuntu text-primaryDarkText font-[500] text-nowrap text-xl sm:text-2xl lg:text-xl xl:text-2xl">
+    //             {"Manage clients' shareholder data and many more"}
+    //           </p>
+    //         </div>
+
+    //         <div className="space-y-3 flex flex-col gap-4">
+    //           {[
+    //             "Seamless Setup & Control",
+    //             "Efficient Processes",
+    //             "Powerful Enquiries",
+    //             "Insightful Reporting",
+    //           ].map((feature, index) => (
+    //             <div key={index} className="flex items-center space-x-3">
+    //               <div className="w-3 h-3 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+    //                 <Check className="w-2 h-2 text-white stroke-[3]" />
+    //               </div>
+    //               <span className="text-textBlack font-poppins font-[400] text-[18px]">
+    //                 {feature}
+    //               </span>
+    //             </div>
+    //           ))}
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </div>
+
     <div
-      className="min-h-screen bg-white bg-cover bg-center bg-no-repeat"
+      className="min-h-screen bg-gradient-to-br from-[#f5f7fb] via-white to-[#eef2ff] bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: "url('/login.png')",
       }}
     >
-      <div className="min-h-screen flex bg-[rgba(255,255,255,0.5)]">
-        {/* Left side - Login Form */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-[650px] bg-white rounded shadow-lg border border-gray-100 py-12 px-8 space-y-6 min-h-[55vh]">
-            <div className="text-center space-y-2 mt-16 lg:mt-0 mb-10">
-              <h1 className="text-3xl font-ubuntu font-[500] text-textBlack text-balance">
+      <div className="min-h-screen flex bg-white/60 backdrop-blur-sm">
+        {/* Left side - Login Form to see*/}
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-10">
+          <div className="w-full max-w-[620px] bg-white shadow-2xl border border-gray-100 rounded-3xl py-12 px-10 space-y-8">
+            <div className="space-y-3 text-center">
+              <h1 className="text-[32px] leading-tight font-ubuntu font-semibold text-[#0f172a] text-balance">
                 Welcome to E-Stock
               </h1>
-              <p className="text-[18px] text-textBlack font-poppins">
-                Please enter your official email details to sign in
+              <p className="text-[17px] text-gray-700 font-poppins">
+                Sign in with your official Microsoft account
               </p>
             </div>
 
-            {/* Form */}
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="space-y-4 flex flex-col gap-4"
-            >
-              <div className="space-y-1">
-                <Label htmlFor="email" className="sr-only">
-                  Email Address
-                </Label>
-                <div className="relative">
-                  <Mail
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-4 w-4 fill-[#5A5A5A]"
-                    fill="currentColor"
-                  />
-                  <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-6 w-[0.5px] bg-[#a8a7a7]"></div>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Email Address"
-                    className="pl-10 h-12 bg-[#F2F2F2] border border-gray-200 focus:border-gray-300 focus:ring-0 text-sm placeholder:text-gray-400"
-                    {...register("email")}
-                  />
-                </div>
-                {errors.email && (
-                  <p className="text-xs text-red-600">{errors.email.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <Label htmlFor="password" className="sr-only">
-                  Password
-                </Label>
-                <div className="relative">
-                  <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5A5A5A] h-4 w-4" />
-                  <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-[#F2F2F2] h-6 w-[0.5px] bg-[#a8a7a7]"></div>
-                  <Input
-                    id="password"
-                    type={isPasswordVisible ? "text" : "password"}
-                    placeholder="Password"
-                    className="pl-10 h-12 bg-[#F2F2F2] border border-gray-200 focus:border-gray-300 focus:ring-0 text-sm placeholder:text-gray-400"
-                    onFocus={() => setIsPasswordFocused(true)}
-                    onBlur={(e) => {
-                      setIsPasswordFocused(false);
-                      rhfPasswordOnBlur(e);
-                    }}
-                    ref={passwordRef}
-                    {...passwordFieldProps}
-                  />
-                  {isPasswordFocused && (
-                    <button
-                      type="button"
-                      aria-label={
-                        isPasswordVisible ? "Hide password" : "Show password"
-                      }
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5A5A5A]"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => setIsPasswordVisible((v) => !v)}
-                    >
-                      {isPasswordVisible ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  )}
-                </div>
-                {errors.password && (
-                  <p className="text-xs text-red-600">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="rememberMe"
-                    checked={rememberMe}
-                    onCheckedChange={(checked) =>
-                      setValue("rememberMe", !!checked)
-                    }
-                    className="h-4 w-4"
-                  />
-                  <Label
-                    htmlFor="rememberMe"
-                    className="text-sm text-gray-700 font-normal"
-                  >
-                    Remember me
-                  </Label>
-                </div>
-                {/* <button
-                  type="button"
-                  className="text-sm text-gray-600 hover:text-gray-900 underline"
-                >
-                  Forgot Password?
-                </button> */}
-              </div>
-
-              <div className="pt-4">
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-full text-sm"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Signing in..." : "Sign in"}{" "}
-                  <User className="ml-2 text-[#F2F2F2]" size={16} />
-                </Button>
-              </div>
-            </form>
+            <div className="space-y-6">
+              <Button
+                type="button"
+                onClick={handleMicrosoftSignIn}
+                className="w-full h-12 bg-[#1A225D] hover:bg-[#111844] text-white rounded-full text-sm font-semibold flex items-center justify-center gap-2"
+                disabled={isLoading}
+                asChild
+              >
+                {/* <a href={microsoftSignInUrl}> */}
+                <span className="flex items-center gap-2">
+                  <MicrosoftLogo />
+                  {isLoading ? "Signing in..." : "Sign in with Microsoft"}
+                </span>
+                {/* </a> */}
+              </Button>
+              <p className="text-center text-sm text-gray-700 font-poppins">
+                You'll be redirected to Microsoft to continue signing in.
+              </p>
+            </div>
           </div>
         </div>
 
