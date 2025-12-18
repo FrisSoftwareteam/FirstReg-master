@@ -33,17 +33,17 @@ namespace FirstReg.Web
 
         private static readonly List<Video> Media = new()
         {
-            new Video("First Registrars Mobile App", "https://www.youtube.com/watch?v=G_88U5XnsvE", "f-video.jpg"),
-            new Video("Sec Pigin Language 2", "https://www.youtube.com/watch?v=xzfAefB6UF4", "s-video.jpg"),
+            new Video("Webinar: Overcoming Bottlenecks in the Probate and Letters of Administration Process in Nigeria", "https://www.youtube.com/live/Y7ZE5z5lP0I?feature=share", "https://img.youtube.com/vi/Y7ZE5z5lP0I/hqdefault.jpg"),
+            new Video("Webinar: Evolving Share Data Administration & Registrar Services", "https://www.youtube.com/watch?v=WX3hj-JRFVA", "https://img.youtube.com/vi/WX3hj-JRFVA/hqdefault.jpg"),
+            new Video("Navigating Corporate Governance", "https://www.youtube.com/watch?v=jO6RKbGix7c", "https://img.youtube.com/vi/jO6RKbGix7c/hqdefault.jpg"),
+            new Video("Understanding Company Structures", "https://www.youtube.com/watch?v=CQoLHnDoeX8", "https://img.youtube.com/vi/CQoLHnDoeX8/hqdefault.jpg"),
+            new Video("Overcoming Bottlenecks in the Probate and Letters of Administration Process in Nigeria", "https://www.youtube.com/watch?v=dHzYDa3sfPQ", "https://img.youtube.com/vi/dHzYDa3sfPQ/hqdefault.jpg"),
             new Video("Sec Pigin Language", "https://www.youtube.com/watch?v=HvOYW60zE7k", "t-video.jpg"),
             new Video("Your Shares and the Registrars", "https://www.youtube.com/watch?v=3t7LXvh98xo", "shares-and-reg.jpg"),
+            new Video("Sec Pigin Language 2", "https://www.youtube.com/watch?v=xzfAefB6UF4", "s-video.jpg"),
+            new Video("First Registrars Mobile App", "https://www.youtube.com/watch?v=G_88U5XnsvE", "f-video.jpg"),
             new Video("CEO, First Registrars Services shares his experience positioning it at the industry’s top player", "https://www.youtube.com/watch?v=wJQDpUu1XYY", "ceo.jpg"),
-            new Video("Disengaging First Registrars from First Bank", "https://www.youtube.com/watch?v=crlVruZ39q8", "reg-from-fbn.jpg"),
-            new Video("Webinar: Evolving Share Data Administration & Registrar Services", "https://www.youtube.com/watch?v=WX3hj-JRFVA", "https://img.youtube.com/vi/WX3hj-JRFVA/hqdefault.jpg"),
-            new Video("Understanding Company Structures", "https://www.youtube.com/watch?v=CQoLHnDoeX8", "https://img.youtube.com/vi/CQoLHnDoeX8/hqdefault.jpg"),
-            new Video("Demystifying Probate", "https://www.youtube.com/watch?v=Y7ZE5z5lP0I", "https://img.youtube.com/vi/Y7ZE5z5lP0I/hqdefault.jpg"),
-            new Video("Navigating Corporate Governance", "https://www.youtube.com/watch?v=jO6RKbGix7c", "https://img.youtube.com/vi/jO6RKbGix7c/hqdefault.jpg"),
-            new Video("Overcoming Bottlenecks in the Probate and Letters of Administration Process in Nigeria", "https://www.youtube.com/watch?v=dHzYDa3sfPQ", "https://img.youtube.com/vi/dHzYDa3sfPQ/hqdefault.jpg"),
+
             //new Video("First Registrars IVR Robocall", "https://www.youtube.com/watch?v=b6CoH03PJ0Y", "robocall.jpg"),
         };
 
