@@ -20,7 +20,11 @@ export async function POST(request: Request) {
 
     if (res.ok && (data as any)?.token) {
       const tokenType = (data as any)?.token_type || "Bearer";
-      const response = NextResponse.json({ success: true });
+      const response = NextResponse.json({ 
+        success: true, 
+        token: (data as any).token,
+        user: (data as any).user 
+      });
       response.cookies.set("auth_token", `${tokenType} ${(data as any).token}`, {
         httpOnly: true,
         secure: true,

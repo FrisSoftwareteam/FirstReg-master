@@ -1,9 +1,13 @@
 import { cookies } from "next/headers";
 
 export function getApiBaseUrl() {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL;
-  if (!url) throw new Error("NEXT_PUBLIC_API_BASE_URL is not set");
-  return url.replace(/\/$/, "");
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
+  if (!url) throw new Error("NEXT_PUBLIC_API_BASE_URL or NEXT_PUBLIC_API_URL is not set");
+  let cleanUrl = url.replace(/\/$/, "");
+  if (cleanUrl.endsWith("/api")) {
+    cleanUrl = cleanUrl.slice(0, -4);
+  }
+  return cleanUrl;
 }
 
 // Server-side fetch that attaches Authorization from httpOnly cookie

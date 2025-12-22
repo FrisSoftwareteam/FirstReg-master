@@ -3,7 +3,9 @@ import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import type { Storage } from "redux-persist";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import counterReducer from "@/lib/redux/slices/counterSlice";
+import authReducer, { logout } from "@/lib/redux/slices/authSlice";
 import { baseApi } from "@/lib/services/baseApi";
+import { setupAxios } from "@/lib/axios";
 
 const createNoopStorage = (): Storage => {
   return {
@@ -26,6 +28,7 @@ const storage: Storage =
 
 const rootReducer = combineReducers({
   counter: counterReducer,
+  auth: authReducer,
   [baseApi.reducerPath]: baseApi.reducer,
 });
 
@@ -33,7 +36,7 @@ const persistedReducer = persistReducer(
   {
     key: "root",
     storage,
-    whitelist: ["counter"],
+    whitelist: ["counter", "auth"],
     version: 1,
   },
   rootReducer
@@ -48,6 +51,8 @@ export const store = configureStore({
       },
     }).concat(baseApi.middleware),
 });
+
+setupAxios(store, logout);
 
 export const persistor = persistStore(store);
 

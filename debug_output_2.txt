@@ -1,0 +1,25 @@
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> GET /api/auth/simulation-users HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> 
+* Request completely sent off
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0< HTTP/1.1 200 OK
+< vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch
+< content-type: application/json
+< Date: Sun, 21 Dec 2025 12:20:29 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+< Transfer-Encoding: chunked
+< 
+{ [1755 bytes data]
+100  1743    0  1743    0     0    730      0 --:--:--  0:00:02 --:--:--   730
+* Connection #0 to host localhost left intact
+{"success":true,"users":[{"id":1,"email":"test@example.com","first_name":"Test","last_name":"Admin","department":"IT","is_active":true},{"id":2,"email":"superadmin@company.com","first_name":"Super","last_name":"Admin","department":"IT","is_active":true},{"id":3,"email":"tosin.esan+5jWD9@example.com","first_name":"Tosin","last_name":"Esan","department":"Finance","is_active":true},{"id":4,"email":"michael.okafor+qHBvC@example.com","first_name":"Michael","last_name":"Okafor","department":"Marketing","is_active":true},{"id":5,"email":"john.williams+zWkC3@example.com","first_name":"John","last_name":"Williams","department":"Customer Service","is_active":true},{"id":6,"email":"sarah.adebayo+AWGeU@example.com","first_name":"Sarah","last_name":"Adebayo","department":"IT","is_active":true},{"id":8,"email":"daniel.brown+7T6aP@example.com","first_name":"Daniel","last_name":"Brown","department":"IT","is_active":true},{"id":9,"email":"david.smith+oORsP@example.com","first_name":"David","last_name":"Smith","department":"Operations","is_active":true},{"id":10,"email":"tosin.garcia+10u1x@example.com","first_name":"Tosin","last_name":"Garcia","department":"IT","is_active":true},{"id":11,"email":"jane.jones+L3Hte@example.com","first_name":"Jane","last_name":"Jones","department":"Operations","is_active":true},{"id":12,"email":"grace.musa+zI4Z0@example.com","first_name":"Grace","last_name":"Musa","department":"Customer Service","is_active":true},{"id":13,"email":"Colin.Decorce@firstregistrarsnigeria.com","first_name":"Colin","last_name":"Decorce","department":null,"is_active":true},{"id":14,"email":"Joshua@cle.ng","first_name":"Joshua","last_name":"Esan","department":null,"is_active":true}],"message":"Available users for simulation"}

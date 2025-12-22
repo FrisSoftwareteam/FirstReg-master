@@ -7,11 +7,24 @@ import {
   AvatarImage,
 } from "@/components/components/ui/avatar";
 import { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "@/hooks/useAuth";
+import { useDispatch } from "react-redux";
+import { logout } from "@/lib/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const { user, isLoading } = useAuth();
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+   const handleLogout = () => {
+    dispatch(logout());
+    router.push("/");
+  };
 
   // Check if device is mobile
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768; // md breakpoint
@@ -91,19 +104,22 @@ export default function Header() {
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-xs font-medium text-gray-700">
                   <Avatar className="h-8 w-8 md:h-10 md:w-10 border-2 border-gray-200">
-                    <AvatarImage src="/profileT.jpg" />
+                    <AvatarImage src={user?.profile_picture || ""} />
                     <AvatarFallback className="bg-gray-100 text-lg font-semibold text-gray-600">
-                      EE
+                      {user?.first_name?.charAt(0).toUpperCase() ?? user?.last_name?.charAt(0).toUpperCase() ?? "EE"}
                     </AvatarFallback>
                   </Avatar>
                 </span>
               </div>
               <div className="hidden sm:flex flex-col max-w-[140px] md:max-w-[200px] lg:max-w-none">
                 <span className="text-sm font-medium text-gray-900 truncate">
-                  Emmanuel Effiong
+                  {/* Emmanuel Effiong */}
+                  {/* {user?.email?.split("@")[0] || "User"} */}
+                  {user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : (user?.email?.split("@")[0] || "User")}
                 </span>
                 <span className="text-xs text-gray-500 truncate">
-                  emmanuel.effiong@firstregistrarsnigeria.com
+                  {/* emmanuel.effiong@firstregistrarsnigeria.com */}
+                  {user?.email}
                 </span>
               </div>
               <div
@@ -141,6 +157,7 @@ export default function Header() {
                     e.stopPropagation();
                     // Handle sign out
                     console.log("Sign out clicked");
+                    handleLogout()
                     setIsOpen(false);
                   }}
                   className="w-1/2 flex items-center rounded-full justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-350"

@@ -3,15 +3,51 @@
 // import Breadcrumb from "@/components/breadcrumb";
 import ModuleCard from "@/components/module-card";
 import { useBreadcrumbNavigation } from "../../hooks/useBreadcrumbNavigation";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, fetchUserProfile } from "@/lib/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { AppDispatch, RootState } from "@/lib/redux/store";
 
 export default function Dashboard() {
   const { navigateWithBreadcrumb } = useBreadcrumbNavigation();
+  const { user, isLoading } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const auth = useSelector((state: RootState) => state.auth);
+  const { status } = auth || { status: "idle" };
+
+  useEffect(() => {
+    // Fetch user profile if not fully loaded (e.g. check for first_name)
+    // or always fetch to ensure freshness
+    if (!user?.first_name) {
+       dispatch(fetchUserProfile());
+    }
+  }, [dispatch, user?.first_name]);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/");
+  };
+  
+  if (isLoading || status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1A225D] mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const modules = [
     {
       title: "User Administration",
       description:
-        "Manage and control user access, roles and permission  with ease.",
+        "Manage and control user access,Roles and permission  with ease.",
       icon: "/Vector.png",
       href: "/dashboard/user-admin",
     },
@@ -23,11 +59,11 @@ export default function Dashboard() {
       href: "/dashboard/shareholder-management",
     },
     {
-      title: "Enquiries",
+      title: "Company Register Managment",
       description:
-        "Access holder enquiries, stock in issue, and register summaries. Track CSCS transactions, certificates, warrants, audit logs, and messages",
+        "Manage companies register, Handle dividends, correspondence, and reports",
       icon: "/Vector.png",
-      href: "/dashboard/enquiries",
+      href: "/dashboard/company-register",
     },
     {
       title: "Reports",
@@ -50,14 +86,20 @@ export default function Dashboard() {
       <main className="px-6 py-8">
         {/* <Breadcrumb /> */}
 
-        <div className="mb-4 mx-[28px]">
+        <div className="mb-4 mx-[28px] flex justify-between items-center">
           <span className="text-[#C10B0B] text-sm font-medium">
             • Super Admin •
           </span>
+          {/* <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">{user?.email}</span>
+            <Button onClick={handleLogout} variant="outline" size="sm">
+              Logout
+            </Button>
+          </div> */}
         </div>
 
         <h1 className="text-4xl mx-[28px] font-ubuntu font-[500] text-primary mb-8">
-          Good Morning , Emmanuel
+          Good Morning, {user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : (user?.email?.split("@")[0] || "User")}
         </h1>
 
         <div className="flex justify-center mb-12">
