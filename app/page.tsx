@@ -223,12 +223,10 @@ export default function LoginPage() {
                 disabled={isLoading}
                 asChild
               >
-                {/* <a href={microsoftSignInUrl}> */}
                 <span className="flex items-center gap-2">
                   <MicrosoftLogo />
                   {isLoading ? "Signing in..." : "Sign in with Microsoft"}
                 </span>
-                {/* </a> */}
               </Button>
               <DebugLogin />
               <p className="text-center text-sm text-gray-700 font-poppins">
