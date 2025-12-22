@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ReduxProvider } from "@/lib/redux/ReduxProvider";
+import { Providers } from "@/components/providers";
+import { Toaster } from "sonner";
 import { Ubuntu, Poppins } from "next/font/google";
 
 const ubuntu = Ubuntu({
@@ -44,7 +46,12 @@ export default function RootLayout({
       className={`${ubuntu.variable} ${poppins.variable}`}
     >
       <body className="font-sans antialiased">
-        <ReduxProvider>{children}</ReduxProvider>
+        <Providers>
+          <ReduxProvider>
+            {children}
+            <Toaster richColors position="top-right" />
+          </ReduxProvider>
+        </Providers>
       </body>
     </html>
   );
