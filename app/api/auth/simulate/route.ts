@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const res = await fetch(`${api}/api/auth/simulate`, {
+    const res = await fetch(`${api}/auth/simulate`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ email }),
@@ -20,10 +20,9 @@ export async function POST(request: Request) {
 
     if (res.ok && (data as any)?.token) {
       const tokenType = (data as any)?.token_type || "Bearer";
-      const response = NextResponse.json({ 
-        success: true, 
-        token: (data as any).token,
-        user: (data as any).user 
+      const response = NextResponse.json({
+        success: true,
+        ...data
       });
       response.cookies.set("auth_token", `${tokenType} ${(data as any).token}`, {
         httpOnly: true,

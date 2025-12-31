@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import UserSelect from "@/components/user-select";
+import { useState, useEffect, useCallback } from "react";
+import UserSelect, { User } from "@/components/user-select";
 import {
   Avatar,
   AvatarFallback,
@@ -10,22 +10,20 @@ import {
 import { Button } from "@/components/components/ui/button";
 import { Checkbox } from "@/components/components/ui/checkbox";
 import { Mail, Phone } from "lucide-react";
+import axios from "axios";
+import axiosInstance from "@/lib/axios";
 // import Breadcrumb from "@/components/breadcrumb";
 
 export default function UserAdministration() {
-  const [selectedUser, setSelectedUser] = useState("Emmanuel Effiong");
-  const users = [
-    "Emmanuel Effiong",
-    "Jane Doe",
-    "John Smith",
-    "Mary Johnson",
-    "Samuel Lee",
-    "Fatima Bello",
-    "Chinedu Okafor",
-    "Aisha Musa",
-    "David Brown",
-    "Grace Williams",
-  ];
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [pagination, setPagination] = useState<{
+    next_page_url: string | null;
+    current_page: number;
+    last_page: number;
+  } | null>(null);
 
   const filterButtons = [
     "Range Auth Setup",
@@ -38,137 +36,114 @@ export default function UserAdministration() {
     "Web Clients",
   ];
 
-  const sections = [
-    {
-      title: "General Administration",
-      items: [
-        "User Administration",
-        "Registrars Administration",
-        "General Administration",
-        "Agent Administration",
-        "Branch Administration",
-        "Audit Administration",
-      ],
-    },
-    {
-      title: "Certificate Management",
-      items: [
-        "Certificate Return Update",
-        "Certificate Claim Update",
-        "Cert. Stoppage",
-        "Un-Stop Certificate",
-        "Cancellation",
-        "Cert Modify",
-        "Certificate Statement Printing",
-        "Correction Entry (Transfer)",
-        "Bonus Setup",
-        "Amalgamation",
-        "Split",
-        "Annotate",
-        "Remover Cert. Verified",
-        "Cert Replacement",
-      ],
-    },
-    {
-      title: "Other Modules",
-      items: [
-        "Verification",
-        "Div. Reconciliation",
-        "Accounts Modules",
-        "Funds Management",
-        "Funds Mngt Process",
-        "AGM Device Setup",
-      ],
-    },
-    {
-      title: "Eprint Module",
-      items: [
-        "Div Reissue",
-        "Reissue Batch Points",
-        "Withholding Tax",
-        "Sticky Labels",
-        "Cert. Replacement",
-        "Interest Calc.",
-        "Debenture Calc.",
-        "Supplementary Warrants",
-        "Print Other Warrants",
-        "Replacement Limit",
-      ],
-    },
-    {
-      title: "Shareholder Management",
-      items: [
-        "Open Account",
-        "Consolidation",
-        "Caution",
-        "Change of Name",
-        "Correction of Name",
-        "Change of Address",
-        "Correction of Address",
-        "Change of Mandate",
-        "Change of Probate",
-        "Edit Probate",
-        "Holder Update",
-        "Holder Report",
-        "Holder Extraction",
-        "Print Signature",
-        "View Signature",
-        "Management Reports",
-        "Special Alert",
-      ],
-    },
-    {
-      title: "Warrant Management",
-      items: [
-        "Div. Return Update",
-        "Div. Claim Update",
-        "Dividend Declaration",
-        "Div. Revalidation",
-        "Div. Reports",
-        "Div. Statement Printing",
-        "Annotate",
-        "Reissues/Replacement",
-        "Cert Replacement",
-      ],
-    },
-    {
-      title: "Authorisation",
-      items: [
-        "Change of Name",
-        "Change of Address",
-        "Change of Mandate",
-        "Probate Administration",
-        "Consolidation",
-        "Split",
-        "Amalgamation",
-        "Certificate Replacement",
-        "Dividend Reissues",
-        "Correction Entry",
-      ],
-    },
-    {
-      title: "GSM Operation",
-      items: ["Administration", "Misc Operation", "Ignore Message"],
-    },
-    {
-      title: "Documentation",
-      items: ["Auto", "Correspondence"],
-    },
-    {
-      title: "CSCS Disk Upload",
-      items: ["CSCS Processing", "CSCS Final Run"],
-    },
-    {
-      title: "Others",
-      items: [
-        "Disable User",
-        "Read Only",
-        "Web Messages",
-        "View Special Register",
-      ],
-    },
-  ];
+  const getUserData = useCallback(async (url?: string | null) => {
+    if (url === null) return;
+    
+    // Determine if this is a "load more" request or initial load based on URL presence or page state
+    const isLoadMore = !!url;
+    
+    if (isLoadMore) {
+      setIsLoadingMore(true);
+    } else {
+      setIsLoading(true);
+    }
 
+    try {
+      // If a URL is provided (for next page), use it. Otherwise use the default endpoint.
+      // Note: the API response returns full URLs like "http://.../api/admin/users?page=2".
+      // We need to handle this correctly with axiosInstance which has baseURL.
+      // If the URL is absolute, axios might handle it if passed directly, OR we can extract the path.
+      
+      let fetchUrl = "/admin/users";
+      if (url) {
+         // If url is absolute, we might need to rely on axios handling it or strip base.
+         // Assuming simpler case: if url is passed, use it directly but careful with auth header if domain matches.
+         // Since it is same domain API, axios instance usually handles relative paths best.
+         // Let's assume the API returns full URL.
+         // We can use the axios instance to fetch the full URL if it allows.
+         fetchUrl = url;
+      }
+
+      const res = await axiosInstance.get(fetchUrl);
+
+      // Expected structure based on user input:
+      // {
+      //   success: true,
+      //   data: {
+      //     current_page: 1,
+      //     data: [...],
+      //     next_page_url: "...",
+      //     ...
+      //   }
+      // }
+      
+      const responseData = res.data?.data; // The pagination object
+
+      if (responseData && Array.isArray(responseData.data)) {
+        const newUsers = responseData.data;
+        
+        setUsers((prev) => {
+          if (isLoadMore) {
+            // Filter out duplicates just in case
+            const existingIds = new Set(prev.map(u => u.id));
+            const uniqueNewUsers = newUsers.filter((u: User) => !existingIds.has(u.id));
+            return [...prev, ...uniqueNewUsers];
+          } else {
+            return newUsers;
+          }
+        });
+
+        setPagination({
+          next_page_url: responseData.next_page_url,
+          current_page: responseData.current_page,
+          last_page: responseData.last_page,
+        });
+
+        // If it's the first load and we have users, select the first one if none selected
+        if (!isLoadMore && newUsers.length > 0 && !selectedUser) {
+           // Optional: Auto select first user? User didn't explicitly ask for this but typical
+           // setSelectedUser(newUsers[0]);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+    }
+  }, [selectedUser]); // Removed dependency on selectedUser to avoid infinite loops if it was there, kept generic
+
+  useEffect(() => {
+    getUserData();
+  }, [getUserData]);
+
+  const handleLoadMore = () => {
+    if (pagination?.next_page_url && !isLoadingMore) {
+      getUserData(pagination.next_page_url);
+    }
+  };
+
+  const handleUserSelect = async(user: User) => {
+    try {
+      const res = await axiosInstance.get(`/admin/users/${user.id}/roles-with-permissions`);
+      setSelectedUser(user);
+    console.log({
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      department: user.department,
+      is_active: user.is_active,
+      profile_picture: user.profile_picture,
+    });
+    console.log(res.data);
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+    }
+  };
+
+  
+  
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
       <main className="px-4 sm:px-6 md:px-10 lg:px-14 py-6 md:py-8">
@@ -193,9 +168,9 @@ export default function UserAdministration() {
             {/* Left: Avatar */}
             <div className="flex justify-center md:justify-start">
               <Avatar className="h-24 w-24 md:h-28 md:w-28 border-2 border-gray-200">
-                <AvatarImage src="/profileT.jpg" />
+                <AvatarImage src={selectedUser?.profile_picture || "/profileT.jpg"} />
                 <AvatarFallback className="bg-gray-100 text-lg font-semibold text-gray-600">
-                  EE
+                  {selectedUser ? `${selectedUser.first_name[0]}${selectedUser.last_name[0]}` : "U"}
                 </AvatarFallback>
               </Avatar>
             </div>
@@ -209,8 +184,11 @@ export default function UserAdministration() {
                 <UserSelect
                   users={users}
                   value={selectedUser}
-                  onChange={setSelectedUser}
+                  onChange={handleUserSelect}
                   placeholder="Select a user"
+                  onLoadMore={handleLoadMore}
+                  hasMore={!!pagination?.next_page_url}
+                  loading={isLoadingMore}
                 />
               </div>
 
@@ -245,13 +223,13 @@ export default function UserAdministration() {
                 <div className="space-y-4 text-sm">
                   <div className="">
                     <p className="text-sm font-bold text-gray-600 tracking-wide">
-                      DEPT: Information Technology
+                      DEPT: {selectedUser?.department || "N/A"}
                     </p>
                     {/* <p className="font-medium text-gray-900"></p> */}
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-600 tracking-wide">
-                      ID: FRIS-0220
+                      ID: {selectedUser?.id ? `FRIS-${selectedUser.id.toString().padStart(4, "0")}` : "N/A"}
                     </p>
                     {/* <p className="font-medium text-gray-900"></p> */}
                   </div>
@@ -262,13 +240,14 @@ export default function UserAdministration() {
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-blue-600" />
                     <p className="text-sm font-bold text-primary overflow-hidden text-ellipsis md:overflow-visible max-w-[280px]">
-                      emmanuel.effiong@firstregistrarsnigeria.com
+                      {selectedUser?.email || "No email"}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-gray-600" />
                     <p className="text-sm font-medium text-gray-900">
-                      (+234) 080 43212353
+                      {/* Placeholder for phone as it's not in User interface yet */}
+                      (+234) 080 0000 0000
                     </p>
                   </div>
                 </div>

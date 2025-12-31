@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import UserSelect from "@/components/user-select";
+import UserSelect, { User } from "@/components/user-select";
 import {
   Avatar,
   AvatarFallback,
@@ -13,18 +13,10 @@ import { Mail, Phone } from "lucide-react";
 // import Breadcrumb from "@/components/breadcrumb";
 
 export default function UserAdministration() {
-  const [selectedUser, setSelectedUser] = useState("Emmanuel Effiong");
-  const users = [
-    "Emmanuel Effiong",
-    "Jane Doe",
-    "John Smith",
-    "Mary Johnson",
-    "Samuel Lee",
-    "Fatima Bello",
-    "Chinedu Okafor",
-    "Aisha Musa",
-    "David Brown",
-    "Grace Williams",
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const users: User[] = [
+    // { id: 1, first_name: "Emmanuel", last_name: "Effiong", email: "emmanuel@example.com", department: "IT", is_active: true, profile_picture: null },
+    // { id: 2, first_name: "Jane", last_name: "Doe", email: "jane@example.com", department: "HR", is_active: true, profile_picture: null },
   ];
 
   const filterButtons = [
@@ -38,136 +30,136 @@ export default function UserAdministration() {
     "Web Clients",
   ];
 
-  const sections = [
-    {
-      title: "General Administration",
-      items: [
-        "User Administration",
-        "Registrars Administration",
-        "General Administration",
-        "Agent Administration",
-        "Branch Administration",
-        "Audit Administration",
-      ],
-    },
-    {
-      title: "Certificate Management",
-      items: [
-        "Certificate Return Update",
-        "Certificate Claim Update",
-        "Cert. Stoppage",
-        "Un-Stop Certificate",
-        "Cancellation",
-        "Cert Modify",
-        "Certificate Statement Printing",
-        "Correction Entry (Transfer)",
-        "Bonus Setup",
-        "Amalgamation",
-        "Split",
-        "Annotate",
-        "Remover Cert. Verified",
-        "Cert Replacement",
-      ],
-    },
-    {
-      title: "Other Modules",
-      items: [
-        "Verification",
-        "Div. Reconciliation",
-        "Accounts Modules",
-        "Funds Management",
-        "Funds Mngt Process",
-        "AGM Device Setup",
-      ],
-    },
-    {
-      title: "Eprint Module",
-      items: [
-        "Div Reissue",
-        "Reissue Batch Points",
-        "Withholding Tax",
-        "Sticky Labels",
-        "Cert. Replacement",
-        "Interest Calc.",
-        "Debenture Calc.",
-        "Supplementary Warrants",
-        "Print Other Warrants",
-        "Replacement Limit",
-      ],
-    },
-    {
-      title: "Shareholder Management",
-      items: [
-        "Open Account",
-        "Consolidation",
-        "Caution",
-        "Change of Name",
-        "Correction of Name",
-        "Change of Address",
-        "Correction of Address",
-        "Change of Mandate",
-        "Change of Probate",
-        "Edit Probate",
-        "Holder Update",
-        "Holder Report",
-        "Holder Extraction",
-        "Print Signature",
-        "View Signature",
-        "Management Reports",
-        "Special Alert",
-      ],
-    },
-    {
-      title: "Warrant Management",
-      items: [
-        "Div. Return Update",
-        "Div. Claim Update",
-        "Dividend Declaration",
-        "Div. Revalidation",
-        "Div. Reports",
-        "Div. Statement Printing",
-        "Annotate",
-        "Reissues/Replacement",
-        "Cert Replacement",
-      ],
-    },
-    {
-      title: "Authorisation",
-      items: [
-        "Change of Name",
-        "Change of Address",
-        "Change of Mandate",
-        "Probate Administration",
-        "Consolidation",
-        "Split",
-        "Amalgamation",
-        "Certificate Replacement",
-        "Dividend Reissues",
-        "Correction Entry",
-      ],
-    },
-    {
-      title: "GSM Operation",
-      items: ["Administration", "Misc Operation", "Ignore Message"],
-    },
-    {
-      title: "Documentation",
-      items: ["Auto", "Correspondence"],
-    },
-    {
-      title: "CSCS Disk Upload",
-      items: ["CSCS Processing", "CSCS Final Run"],
-    },
-    {
-      title: "Others",
-      items: [
-        "Disable User",
-        "Read Only",
-        "Web Messages",
-        "View Special Register",
-      ],
-    },
-  ];
+  // const sections = [
+  //   {
+  //     title: "General Administration",
+  //     items: [
+  //       "User Administration",
+  //       "Registrars Administration",
+  //       "General Administration",
+  //       "Agent Administration",
+  //       "Branch Administration",
+  //       "Audit Administration",
+  //     ],
+  //   },
+  //   {
+  //     title: "Certificate Management",
+  //     items: [
+  //       "Certificate Return Update",
+  //       "Certificate Claim Update",
+  //       "Cert. Stoppage",
+  //       "Un-Stop Certificate",
+  //       "Cancellation",
+  //       "Cert Modify",
+  //       "Certificate Statement Printing",
+  //       "Correction Entry (Transfer)",
+  //       "Bonus Setup",
+  //       "Amalgamation",
+  //       "Split",
+  //       "Annotate",
+  //       "Remover Cert. Verified",
+  //       "Cert Replacement",
+  //     ],
+  //   },
+  //   {
+  //     title: "Other Modules",
+  //     items: [
+  //       "Verification",
+  //       "Div. Reconciliation",
+  //       "Accounts Modules",
+  //       "Funds Management",
+  //       "Funds Mngt Process",
+  //       "AGM Device Setup",
+  //     ],
+  //   },
+  //   {
+  //     title: "Eprint Module",
+  //     items: [
+  //       "Div Reissue",
+  //       "Reissue Batch Points",
+  //       "Withholding Tax",
+  //       "Sticky Labels",
+  //       "Cert. Replacement",
+  //       "Interest Calc.",
+  //       "Debenture Calc.",
+  //       "Supplementary Warrants",
+  //       "Print Other Warrants",
+  //       "Replacement Limit",
+  //     ],
+  //   },
+  //   {
+  //     title: "Shareholder Management",
+  //     items: [
+  //       "Open Account",
+  //       "Consolidation",
+  //       "Caution",
+  //       "Change of Name",
+  //       "Correction of Name",
+  //       "Change of Address",
+  //       "Correction of Address",
+  //       "Change of Mandate",
+  //       "Change of Probate",
+  //       "Edit Probate",
+  //       "Holder Update",
+  //       "Holder Report",
+  //       "Holder Extraction",
+  //       "Print Signature",
+  //       "View Signature",
+  //       "Management Reports",
+  //       "Special Alert",
+  //     ],
+  //   },
+  //   {
+  //     title: "Warrant Management",
+  //     items: [
+  //       "Div. Return Update",
+  //       "Div. Claim Update",
+  //       "Dividend Declaration",
+  //       "Div. Revalidation",
+  //       "Div. Reports",
+  //       "Div. Statement Printing",
+  //       "Annotate",
+  //       "Reissues/Replacement",
+  //       "Cert Replacement",
+  //     ],
+  //   },
+  //   {
+  //     title: "Authorisation",
+  //     items: [
+  //       "Change of Name",
+  //       "Change of Address",
+  //       "Change of Mandate",
+  //       "Probate Administration",
+  //       "Consolidation",
+  //       "Split",
+  //       "Amalgamation",
+  //       "Certificate Replacement",
+  //       "Dividend Reissues",
+  //       "Correction Entry",
+  //     ],
+  //   },
+  //   {
+  //     title: "GSM Operation",
+  //     items: ["Administration", "Misc Operation", "Ignore Message"],
+  //   },
+  //   {
+  //     title: "Documentation",
+  //     items: ["Auto", "Correspondence"],
+  //   },
+  //   {
+  //     title: "CSCS Disk Upload",
+  //     items: ["CSCS Processing", "CSCS Final Run"],
+  //   },
+  //   {
+  //     title: "Others",
+  //     items: [
+  //       "Disable User",
+  //       "Read Only",
+  //       "Web Messages",
+  //       "View Special Register",
+  //     ],
+  //   },
+  // ];
 
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
@@ -211,6 +203,9 @@ export default function UserAdministration() {
                   value={selectedUser}
                   onChange={setSelectedUser}
                   placeholder="Select a user"
+                  hasMore={false}
+                  loading={false}
+                  onLoadMore={() => {}}
                 />
               </div>
 
