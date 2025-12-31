@@ -21,34 +21,21 @@ const MicrosoftLogo = () => (
 );
 
 const DebugLogin = () => {
-  const [users, setUsers] = useState<any[]>([]);
-  const [selectedEmail, setSelectedEmail] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
 
-  useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      axios.get("/api/auth/simulation-users").then((res) => {
-        if (Array.isArray(res.data)) {
-          setUsers(res.data);
-        } else if (res.data?.data && Array.isArray(res.data.data)) {
-             setUsers(res.data.data);
-        } else if (res.data?.users && Array.isArray(res.data.users)) {
-             setUsers(res.data.users);
-        }
-      });
-    }
-  }, []);
-
   const handleDebugLogin = async () => {
-    if (!selectedEmail) return;
+    // Hardcoded email as requested by the user
+    // "replace the debug login flow with actual api endpoint ... request body: { email: 'superadmin@company.com' }"
+    const emailToSimulate = "superadmin@company.com";
+    
     try {
-      const res = await axios.post("/api/auth/simulate", { email: selectedEmail });
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/simulate`, { email: emailToSimulate });
       if (res.data?.success && res.data?.token) {
         dispatch(
           setCredentials({
             token: res.data.token,
-            user: res.data.user || { id: "debug", email: selectedEmail },
+            user: res.data.user || { id: "debug", email: emailToSimulate },
           })
         );
         // @ts-ignore
@@ -73,25 +60,12 @@ const DebugLogin = () => {
           🚧 Debug Login (Dev Only)
         </label>
         <div className="flex gap-2">
-          <select
-            className="flex-1 h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20"
-            value={selectedEmail}
-            onChange={(e) => setSelectedEmail(e.target.value)}
-          >
-            <option value="">Select Test User...</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.email}>
-                {u.first_name || u.email} ({u.roles?.[0]?.name || "No Role"})
-              </option>
-            ))}
-          </select>
           <Button
             type="button"
             onClick={handleDebugLogin}
-            disabled={!selectedEmail}
-            className="h-10 bg-red-500 hover:bg-red-600 text-white"
+            className="w-full h-10 bg-red-500 hover:bg-red-600 text-white rounded-md"
           >
-            Login
+            Simulate Super Admin Login
           </Button>
         </div>
       </div>
