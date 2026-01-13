@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSelector } from "react-redux"; // Import useSelector
 import UserSelect, { User } from "@/components/user-select";
 import {
   Avatar,
@@ -10,11 +11,68 @@ import {
 import { Button } from "@/components/components/ui/button";
 import { Checkbox } from "@/components/components/ui/checkbox";
 import { Mail, Phone } from "lucide-react";
-import axios from "axios";
 import axiosInstance from "@/lib/axios";
-// import Breadcrumb from "@/components/breadcrumb";
+import { toast } from "sonner";
+
+// --- Types ---
+
+interface Pivot {
+  role_id: number;
+  permission_id: number;
+}
+
+interface Permission {
+  id: number;
+  name: string;
+  guard_name: string;
+  created_at: string;
+  updated_at: string;
+  pivot?: Pivot;
+}
+
+interface Role {
+  id: number;
+  name: string;
+  guard_name: string;
+  created_at: string;
+  updated_at: string;
+  permissions: Permission[];
+}
+
+interface RolesResponse {
+  success: boolean;
+  data: {
+    current_page: number;
+    data: Role[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+  };
+}
+
+interface dataResponse{
+  roles:Role[],
+  direct_permissions:Permission[]
+}
+
+interface UserPermissionsResponse {
+  success: boolean;
+  data: dataResponse; // The endpoint returns an array of roles with permissions
+}
 
 export default function UserAdministration() {
+  const { user: currentUser } = useSelector((state: any) => state.auth); // Get current user from Redux
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +82,14 @@ export default function UserAdministration() {
     current_page: number;
     last_page: number;
   } | null>(null);
+
+  // -- Permission State --
+  const [allRoles, setAllRoles] = useState<Role[]>([]);
+  const [userPermissionIds, setUserPermissionIds] = useState<Set<number>>(new Set());
+  const [initialPermissionIds, setInitialPermissionIds] = useState<Set<number>>(new Set());
+  const [isPermissionsLoading, setIsPermissionsLoading] = useState(false);
+  const [isModifying, setIsModifying] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const filterButtons = [
     "Range Auth Setup",
@@ -35,6 +101,81 @@ export default function UserAdministration() {
     "Admin List Report",
     "Web Clients",
   ];
+
+  // Set initial selected user to current user if available and no selection yet
+  useEffect(() => {
+    if (currentUser && !selectedUser) {
+        // We need to cast currentUser to User because Redux User type might differ slightly from local User type
+        // or ensure they are compatible. Assuming they are compatible for now.
+        setSelectedUser(currentUser as User);
+    }
+  }, [currentUser]); // Run when currentUser is loaded/changes
+
+  // --- 1. Load All Available Roles (Groups) ---
+  const loadRoles = useCallback(async () => {
+    try {
+      const res = await axiosInstance.get<RolesResponse>("/roles");
+      if (res.data?.success && res.data?.data?.data) {
+        setAllRoles(res.data.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch roles:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadRoles();
+  }, [loadRoles]);
+
+  // --- 2. Load Selected User's Permissions ---
+  const loadUserPermissions = useCallback(async (userId: number) => {
+    setIsPermissionsLoading(true);
+    try {
+      const res = await axiosInstance.get<UserPermissionsResponse>(
+        `/admin/users/${userId}/roles-with-permissions`
+      );
+      // console.log(res.data.data)
+      if (res.data?.success && Array.isArray(res.data?.data.roles)) {
+        const roles = res.data.data.roles;
+
+        console.log(res.data.data.direct_permissions)
+        const directPermissions = res.data.data.direct_permissions;
+        
+        const ids = new Set<number>();
+        roles.forEach((role) => {
+          if (role.permissions) {
+            role.permissions.forEach((perm) => ids.add(perm.id));
+          }
+        });
+
+        directPermissions.forEach((perm) => ids.add(perm.id));
+
+        setUserPermissionIds(ids);
+        setInitialPermissionIds(ids); // Set initial state for dirty check
+      } else {
+        setUserPermissionIds(new Set());
+        setInitialPermissionIds(new Set());
+      }
+    } catch (error) {
+      console.error("Failed to fetch user permissions:", error);
+      toast.error("Failed to load user permissions");
+      setUserPermissionIds(new Set());
+      setInitialPermissionIds(new Set());
+    } finally {
+        setIsPermissionsLoading(false);
+        setIsEditing(false); // Reset edit mode when loading new user
+    }
+  }, []);
+
+  // UseEffect to load permissions when selectedUser changes
+  useEffect(() => {
+    if (selectedUser?.id) {
+      loadUserPermissions(selectedUser.id);
+    } else {
+      setUserPermissionIds(new Set());
+    }
+  }, [selectedUser, loadUserPermissions]);
+
 
   const getUserData = useCallback(async (url?: string | null) => {
     if (url === null) return;
@@ -49,33 +190,13 @@ export default function UserAdministration() {
     }
 
     try {
-      // If a URL is provided (for next page), use it. Otherwise use the default endpoint.
-      // Note: the API response returns full URLs like "http://.../api/admin/users?page=2".
-      // We need to handle this correctly with axiosInstance which has baseURL.
-      // If the URL is absolute, axios might handle it if passed directly, OR we can extract the path.
       
       let fetchUrl = "/admin/users";
       if (url) {
-         // If url is absolute, we might need to rely on axios handling it or strip base.
-         // Assuming simpler case: if url is passed, use it directly but careful with auth header if domain matches.
-         // Since it is same domain API, axios instance usually handles relative paths best.
-         // Let's assume the API returns full URL.
-         // We can use the axios instance to fetch the full URL if it allows.
          fetchUrl = url;
       }
 
       const res = await axiosInstance.get(fetchUrl);
-
-      // Expected structure based on user input:
-      // {
-      //   success: true,
-      //   data: {
-      //     current_page: 1,
-      //     data: [...],
-      //     next_page_url: "...",
-      //     ...
-      //   }
-      // }
       
       const responseData = res.data?.data; // The pagination object
 
@@ -99,10 +220,13 @@ export default function UserAdministration() {
           last_page: responseData.last_page,
         });
 
-        // If it's the first load and we have users, select the first one if none selected
-        if (!isLoadMore && newUsers.length > 0 && !selectedUser) {
-           // Optional: Auto select first user? User didn't explicitly ask for this but typical
-           // setSelectedUser(newUsers[0]);
+        if (!isLoadMore && newUsers.length > 0) {
+             setSelectedUser((prevSelection) => {
+                 if (!prevSelection) {
+                     return newUsers[0];
+                 }
+                 return prevSelection;
+             });
         }
       }
     } catch (error) {
@@ -111,7 +235,7 @@ export default function UserAdministration() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [selectedUser]); // Removed dependency on selectedUser to avoid infinite loops if it was there, kept generic
+  }, []); // Dependence on selectedUser removed to avoid closure staleness issues if any, handling update functionally
 
   useEffect(() => {
     getUserData();
@@ -123,27 +247,76 @@ export default function UserAdministration() {
     }
   };
 
-  const handleUserSelect = async(user: User) => {
-    try {
-      const res = await axiosInstance.get(`/admin/users/${user.id}/roles-with-permissions`);
-      setSelectedUser(user);
-    console.log({
-      id: user.id,
-      email: user.email,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      department: user.department,
-      is_active: user.is_active,
-      profile_picture: user.profile_picture,
+  const handleUserSelect = (user: User) => {
+    setSelectedUser(user);
+    console.log("allRoles",allRoles)
+    console.log("user Permissions",userPermissionIds)
+    // Permissions are loaded via the useEffect triggered by selectedUser change
+  };
+
+  const handlePermissionToggle = (permissionId: number, checked: boolean) => {
+    setUserPermissionIds(prev => {
+        const newSet = new Set(prev);
+        if (checked) {
+            newSet.add(permissionId);
+        } else {
+            newSet.delete(permissionId);
+        }
+        return newSet;
     });
-    console.log(res.data);
+  };
+
+  const handleModifyUser = async () => {
+    if (!selectedUser) return;
+    
+    if (!isEditing) {
+      setIsEditing(true);
+      return;
+    }
+
+    setIsModifying(true);
+    try {
+        const payload = {
+            permissions: Array.from(userPermissionIds)
+        };
+        
+        await axiosInstance.post(`/admin/users/${selectedUser.id}/permissions`, payload);
+        
+        toast.success("User permissions updated successfully");
+        setInitialPermissionIds(userPermissionIds); // Reset dirty state
+        setIsEditing(false); // Exit edit mode on success
     } catch (error) {
-      console.error("Failed to fetch user:", error);
+        console.error("Failed to update permissions:", error);
+        toast.error("Failed to update user permissions");
+    } finally {
+        setIsModifying(false);
     }
   };
 
-  
-  
+  // Check for changes
+  const hasChanges = 
+    userPermissionIds.size !== initialPermissionIds.size || 
+    Array.from(userPermissionIds).some(id => !initialPermissionIds.has(id));
+
+  // Helper to determine responsive grid classes based on role count
+  const getGridClass = () => {
+    const n = allRoles.length;
+    let cls = "gap-6 md:gap-8 columns-1";
+
+    if (n >= 2) cls += " sm:columns-2";
+    if (n >= 3) cls += " lg:columns-3";
+    // Cap at 4 columns for most large screens to keep them wide
+    if (n >= 4) cls += " xl:columns-4";
+    
+    // Only go to 5 columns on ultra-wide screens (e.g., 1900px+)
+    if (n >= 5) cls += " min-[1900px]:columns-5";
+    
+    // 6 columns only for massive displays
+    if (n >= 6) cls += " min-[2400px]:columns-6";
+
+    return cls;
+  };
+
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
       <main className="px-4 sm:px-6 md:px-10 lg:px-14 py-6 md:py-8">
@@ -153,14 +326,14 @@ export default function UserAdministration() {
         </h1>
 
         <div className="mb-6 flex gap-2 overflow-x-auto pb-2 md:flex-wrap">
-          {filterButtons.map((btn) => (
+          {/* {filterButtons.map((btn) => (
             <button
               key={btn}
               className="whitespace-nowrap rounded-full border border-gray-400 px-4 py-2 text-[10px] text-gray-700 transition hover:bg-gray-50 sm:text-sm"
             >
               {btn}
             </button>
-          ))}
+          ))} */}
         </div>
 
         <div className="mb-8 rounded-lg bg-white p-6 shadow-sm border border-gray-200 md:p-8">
@@ -192,7 +365,7 @@ export default function UserAdministration() {
                 />
               </div>
 
-              <div className="mb-4 flex gap-6 justify-between w-[85%] mr-6 flex-wrap">
+              {/* <div className="mb-4 flex gap-6 justify-between w-[85%] mr-6 flex-wrap">
                 <div className="flex items-center gap-2">
                   <label htmlFor="special-user" className="text-sm">
                     Management /Special User
@@ -213,7 +386,7 @@ export default function UserAdministration() {
                     defaultChecked
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Right: User Details and Modify Button */}
@@ -254,162 +427,56 @@ export default function UserAdministration() {
               </div>
 
               {/* Modify Button */}
-              <Button className="mt-4 w-full rounded-full bg-gray-900 py-5 md:py-6 text-base font-normal text-white hover:bg-gray-800 transition md:mt-auto md:font-semibold">
-                Modify User
+              <Button 
+                onClick={handleModifyUser}
+                disabled={!selectedUser || isModifying || (isEditing && !hasChanges)}
+                className="mt-4 w-full rounded-full bg-gray-900 py-5 md:py-6 text-base font-normal text-white hover:bg-gray-800 transition md:mt-auto md:font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isModifying ? (
+                    <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"/>
+                        Saving...
+                    </div>
+                ) : isEditing ? "Save Changes" : "Modify User"}
               </Button>
             </div>
           </div>
         </div>
 
         {/* Permissions Grid */}
-        <div className="relative rounded-lg border-2 md:border-4 bg-white p-4 md:p-6 overflow-hidden">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {/* Column 1: General Administration & Shareholder Management */}
-            <div className="space-y-4 md:space-y-6">
-              <PermissionSection
-                title="General Administration"
-                items={[
-                  "User Administration",
-                  "Registrars Administration",
-                  "General Administration",
-                  "Agent Administration",
-                  "Branch Administration",
-                  "Audit Administration",
-                ]}
-              />
-              <PermissionSection
-                title="Shareholder Management"
-                items={[
-                  "Open Account",
-                  "Consolidation",
-                  "Caution",
-                  "Change of Name",
-                  "Correction of Name",
-                  "Change of Address",
-                  "Correction of Address",
-                  "Change of Mandate",
-                  "Change of Probate",
-                  "Edit Probate",
-                  "Holder Update",
-                  "Holder Report",
-                  "Holder Extraction",
-                  "Print Signature",
-                  "View Signature",
-                  "Management Reports",
-                  "Special Alert",
-                ]}
-              />
+        <div className="relative rounded-lg border-2 md:border-4 bg-white p-4 md:p-6 overflow-hidden min-h-[400px]">
+        {allRoles.length === 0 ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1A225D]"></div>
             </div>
-
-            {/* Column 2: Certificate Management & Warrant Management */}
-            <div className="space-y-4 md:space-y-6">
-              <PermissionSection
-                title="Certificate Management"
-                items={[
-                  "Certificate Return Update",
-                  "Certificate Claim Update",
-                  "Cert. Stoppage",
-                  "Un-Stop Certificate",
-                  "Cancellation",
-                  "Cert Modify",
-                  "Certificate Statement Printing",
-                  "Correction Entry (Transfer)",
-                  "Bonus Setup",
-                  "Amalgamation",
-                  "Split",
-                  "Annotate",
-                  "Remover Cert. Verified",
-                  "Cert Replacement",
-                ]}
-              />
-              <PermissionSection
-                title="Warrant Management"
-                items={[
-                  "Div. Return Update",
-                  "Div. Claim Update",
-                  "Dividend Declaration",
-                  "Div. Revalidation",
-                  "Div. Reports",
-                  "Div. Statement Printing",
-                  "Annotate",
-                  "Reissues/Replacement",
-                  "Cert Replacement",
-                ]}
-              />
+          ) : (
+            <>
+            {/* Loading Overlay */}
+            {isPermissionsLoading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[1px]">
+                     <div className="flex flex-col items-center">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#1A225D] mb-2"></div>
+                        <p className="text-sm text-[#1A225D] font-medium">Updating permissions...</p>
+                     </div>
+                </div>
+            )}
+            
+            {/* Masonry Layout using CSS columns */}
+            <div className={getGridClass()}>
+                {allRoles.map(role => (
+                    <PermissionSection 
+                        key={role.id}
+                        title={role.name}
+                        items={role.permissions}
+                        checkedIds={userPermissionIds}
+                        onToggle={handlePermissionToggle}
+                        className="break-inside-avoid mb-6"
+                        disabled={!isEditing}
+                    />
+                ))}
             </div>
-
-            {/* Column 3: Other Modules, Authorisation & CSCS */}
-            <div className="space-y-4 md:space-y-6">
-              <PermissionSection
-                title="Other Modules"
-                items={[
-                  "Verification",
-                  "Div. Reconciliation",
-                  "Accounts Modules",
-                  "Funds Management",
-                  "Funds Mngt Process",
-                  "AGM Device Setup",
-                ]}
-              />
-              <PermissionSection
-                title="Authorisation"
-                items={[
-                  "Change of Name",
-                  "Change of Address",
-                  "Change of Mandate",
-                  "Probate Administration",
-                  "Consolidation",
-                  "Split",
-                  "Amalgamation",
-                  "Certificate Replacement",
-                  "Dividend Reissues",
-                  "Correction Entry",
-                ]}
-              />
-              <PermissionSection
-                title="CSCS Disk Upload"
-                items={["CSCS Processing", "CSCS Final Run"]}
-                className="!mb-0"
-              />
-            </div>
-
-            {/* Column 4: Eprint Module, GSM Operation, Documentation & Others */}
-            <div className="space-y-4 md:space-y-6">
-              <PermissionSection
-                title="Eprint Module"
-                items={[
-                  "Div Reissue",
-                  "Reissue Batch Points",
-                  "Withholding Tax",
-                  "Sticky Labels",
-                  "Cert. Replacement",
-                  "Interest Calc.",
-                  "Debenture Calc.",
-                  "Supplementary Warrants",
-                  "Print Other Warrants",
-                  "Replacement Limit",
-                ]}
-              />
-              <PermissionSection
-                title="GSM Operation"
-                items={["Administration", "Misc Operation", "Ignore Message"]}
-              />
-              <PermissionSection
-                title="Documentation"
-                items={["Auto", "Correspondence"]}
-                className="!mb-0"
-              />
-              <PermissionSection
-                title="Others"
-                items={[
-                  "Disable User",
-                  "Read Only",
-                  "Web Messages",
-                  "View Special Register",
-                ]}
-              />
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </main>
     </div>
@@ -419,30 +486,42 @@ export default function UserAdministration() {
 function PermissionSection({
   title,
   items,
+  checkedIds,
+  onToggle,
   className = "",
+  disabled = false,
 }: {
   title: string;
-  items: string[];
+  items: Permission[];
+  checkedIds: Set<number>;
+  onToggle: (id: number, checked: boolean) => void;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
     <div className={`space-y-4 ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2 truncate" title={title}>{title}</h3>
       <div className="flex flex-col gap-2 space-y-2 bg-[#F2F2F2] p-3 rounded-md">
-        {items.map((item) => (
-          <div key={item} className="flex justify-between items-center gap-2">
-            <label htmlFor={item} className="text-xs leading-tight">
-              {item}
-            </label>
+        {items && items.length > 0 ? (
+            items.map((item) => (
+            <div key={item.id} className="flex justify-between items-center gap-2">
+                <label htmlFor={`perm-${item.id}`} className="text-xs leading-tight break-words flex-1 cursor-pointer">
+                {item.name}
+                </label>
 
-            <Checkbox
-              colorClass="data-[state=checked]:bg-green-700 data-[state=checked]:text-white"
-              id={item}
-              defaultChecked
-              className="h-4 w-4"
-            />
-          </div>
-        ))}
+                <Checkbox
+                colorClass="data-[state=checked]:bg-green-700 data-[state=checked]:text-white"
+                id={`perm-${item.id}`}
+                checked={checkedIds.has(item.id)}
+                onCheckedChange={(checked) => onToggle(item.id, checked as boolean)}
+                className="h-4 w-4 shrink-0"
+                disabled={disabled}
+                />
+            </div>
+            ))
+        ) : (
+            <p className="text-xs text-gray-500 italic">No permissions</p>
+        )}
       </div>
     </div>
   );

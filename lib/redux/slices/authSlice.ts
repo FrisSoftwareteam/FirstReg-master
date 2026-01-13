@@ -38,9 +38,8 @@ export const fetchUserProfile = createAsyncThunk(
   "auth/fetchUserProfile",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/user"); // Adjust endpoint as needed, user said "get user api here" in dashboard but usually it's /user or /me. I'll assume /user based on standard conventions or check user previous code.
-      // User request context: "get user api here which only uses the token... returns object { success: true, user: {...} }"
-      // Assuming GET /user (or similar) returns this structure.
+      const response = await axiosInstance.get("/user"); 
+      // console.log("from redux",response.data)
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch user profile");
@@ -54,10 +53,11 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ user: User; token: string }>
+      action: PayloadAction<{ user: User; token: string ; }>
     ) => {
       state.user = { ...state.user, ...action.payload.user };
       state.token = action.payload.token;
+      // state.user.permissions = action.payload.permissions;
       state.isAuthenticated = true;
     },
     logout: (state) => {
@@ -78,6 +78,10 @@ const authSlice = createSlice({
         // Assuming response structure: { success: true, user: {...}, ... }
         if (action.payload.success && action.payload.user) {
           state.user = { ...state.user, ...action.payload.user };
+          if (state.user) {
+            // console.log("permissions",action.payload.permissions)
+            state.user.permissions = action.payload.permissions;
+          }
         } else if (action.payload.id) {
            // Fallback if payload IS the user object directly
            state.user = { ...state.user, ...action.payload };
