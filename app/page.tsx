@@ -36,6 +36,7 @@ const DebugLogin = () => {
           setCredentials({
             token: res.data.token,
             user: res.data.user || { id: "debug", email: emailToSimulate },
+            // permissions: res.data.permissions,
           })
         );
         // @ts-ignore
@@ -112,6 +113,7 @@ export default function LoginPage() {
           setCredentials({
             user: { id: userId, email },
             token,
+            // permissions: [],
           })
         );
         

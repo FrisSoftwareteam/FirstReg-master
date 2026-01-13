@@ -4,33 +4,24 @@
 import ModuleCard from "@/components/module-card";
 import { useBreadcrumbNavigation } from "../../hooks/useBreadcrumbNavigation";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, fetchUserProfile } from "@/lib/redux/slices/authSlice";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+// import { useRouter } from "next/navigation";
+// import { useState } from "react";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 
 export default function Dashboard() {
   const { navigateWithBreadcrumb } = useBreadcrumbNavigation();
   const { user, isLoading } = useAuth();
-  const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
+  // const dispatch = useDispatch<AppDispatch>();
+  // const router = useRouter();
   const auth = useSelector((state: RootState) => state.auth);
   const { status } = auth || { status: "idle" };
 
-  useEffect(() => {
-    // Fetch user profile if not fully loaded (e.g. check for first_name)
-    // or always fetch to ensure freshness
-    if (!user?.first_name) {
-       dispatch(fetchUserProfile());
-    }
-  }, [dispatch, user?.first_name]);
+  // console.log("auth",auth.user?.permissions)
 
-  const handleLogout = () => {
-    dispatch(logout());
-    router.push("/");
-  };
+ 
   
   if (isLoading || status === "loading") {
     return (
@@ -50,6 +41,7 @@ export default function Dashboard() {
         "Manage and control user access,Roles and permission  with ease.",
       icon: "/Vector.png",
       href: "/dashboard/user-admin",
+      permission: "users.view",
     },
     {
       title: "Shareholder Management",
@@ -57,6 +49,7 @@ export default function Dashboard() {
         "Manage holders, certificates, and shareholder updates. Handle consolidations, splits, dividends, correspondence, and reports",
       icon: "/Vector.png",
       href: "/dashboard/shareholder-management",
+      permission: "shares.view",
     },
     {
       title: "Company Register Managment",
@@ -80,6 +73,11 @@ export default function Dashboard() {
       href: "/dashboard/other-modules",
     },
   ];
+
+  const filteredModules = modules.filter(module => {
+     if (!module.permission) return true;
+     return auth.user?.permissions?.includes(module.permission);
+  });
 
   return (
     <div className="min-h-screen bg-[#F2F2F2]">
@@ -111,7 +109,7 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-[54px] gap-x-[98px] mx-[28px] ">
-          {modules.map((module, index) => (
+          {filteredModules.map((module, index) => (
             <ModuleCard
               key={module.title}
               title={module.title}
