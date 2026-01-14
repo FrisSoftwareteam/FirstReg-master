@@ -99,8 +99,8 @@ export default function LoginPage() {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const statusParam = searchParams.get("status");
+  const runFetch=async()=>{
+   const statusParam = searchParams.get("status");
     const token = searchParams.get("token");
     const userId = searchParams.get("user_id");
     const email = searchParams.get("email");
@@ -117,6 +117,9 @@ export default function LoginPage() {
           })
         );
         
+        // @ts-ignore
+        dispatch(fetchUserProfile());
+        
         // Success feedback
         const successMsg = message || "Login successful";
         toast.success(successMsg);
@@ -127,6 +130,10 @@ export default function LoginPage() {
         toast.error(errorMsg);
       }
     }
+  }
+
+  useEffect(() => {
+    runFetch()
   }, [searchParams, dispatch, router]);
 
   const handleMicrosoftSignIn = async () => {
