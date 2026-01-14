@@ -6,20 +6,25 @@ import { useBreadcrumbNavigation } from "../../hooks/useBreadcrumbNavigation";
 import { useAuth } from "@/hooks/useAuth";
 // import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { logout, fetchUserProfile } from "@/lib/redux/slices/authSlice";
+// import { logout, fetchUserProfile } from "@/lib/redux/slices/authSlice";
 // import { useRouter } from "next/navigation";
-// import { useState } from "react";
+import { useEffect } from "react";
 import { AppDispatch, RootState } from "@/lib/redux/store";
+import { fetchUserProfile } from "@/lib/redux/slices/authSlice";
 
 export default function Dashboard() {
   const { navigateWithBreadcrumb } = useBreadcrumbNavigation();
   const { user, isLoading } = useAuth();
-  // const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
   // const router = useRouter();
   const auth = useSelector((state: RootState) => state.auth);
   const { status } = auth || { status: "idle" };
 
   // console.log("auth",auth.user?.permissions)
+
+  useEffect(()=>{
+    dispatch(fetchUserProfile());
+  }, [dispatch])
 
  
   

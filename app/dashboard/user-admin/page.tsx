@@ -199,7 +199,7 @@ export default function UserAdministration() {
       const res = await axiosInstance.get(fetchUrl);
       
       const responseData = res.data?.data; // The pagination object
-
+      console.log(res)
       if (responseData && Array.isArray(responseData.data)) {
         const newUsers = responseData.data;
         
