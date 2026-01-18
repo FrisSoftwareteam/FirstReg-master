@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux"; // Import useSelector
 import UserSelect, { User } from "@/components/user-select";
 import {
@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/components/ui/checkbox";
 import { Mail, Phone } from "lucide-react";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 // --- Types ---
 
@@ -72,7 +73,18 @@ interface UserPermissionsResponse {
 }
 
 export default function UserAdministration() {
-  const { user: currentUser } = useSelector((state: any) => state.auth); // Get current user from Redux
+  const router = useRouter();
+  const { user: currentUser, status } = useSelector((state: any) => state.auth); // Get current user & status from Redux
+  
+  useEffect(() => {
+    if (status === "loading") return; // Wait for auth to load
+    
+    // Check for "users.view" permission
+    if (!currentUser?.permissions?.includes("users.view")) {
+        toast.error("You are not authorized to view this module.");
+        router.push("/dashboard");
+    }
+  }, [currentUser, status, router]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -91,22 +103,19 @@ export default function UserAdministration() {
   const [isModifying, setIsModifying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const filterButtons = [
-    "Range Auth Setup",
-    "Archive /Speed Up",
-    "Report Signatories",
-    "User Time Slot",
-    "Departments",
-    "Public holiday",
-    "Admin List Report",
-    "Web Clients",
-  ];
+  // const filterButtons = [
+  //   "Range Auth Setup",
+  //   "Archive /Speed Up",
+  //   "Report Signatories",
+  //   "User Time Slot",
+  //   "Departments",
+  //   "Public holiday",
+  //   "Admin List Report",
+  //   "Web Clients",
+  // ];
 
-  // Set initial selected user to current user if available and no selection yet
   useEffect(() => {
     if (currentUser && !selectedUser) {
-        // We need to cast currentUser to User because Redux User type might differ slightly from local User type
-        // or ensure they are compatible. Assuming they are compatible for now.
         setSelectedUser(currentUser as User);
     }
   }, [currentUser]); // Run when currentUser is loaded/changes
@@ -138,7 +147,6 @@ export default function UserAdministration() {
       if (res.data?.success && Array.isArray(res.data?.data.roles)) {
         const roles = res.data.data.roles;
 
-        console.log(res.data.data.direct_permissions)
         const directPermissions = res.data.data.direct_permissions;
         
         const ids = new Set<number>();
@@ -156,9 +164,9 @@ export default function UserAdministration() {
         setUserPermissionIds(new Set());
         setInitialPermissionIds(new Set());
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error("Failed to fetch user permissions:", error);
-      toast.error("Failed to load user permissions");
+      toast.error(error.response.data.message);
       setUserPermissionIds(new Set());
       setInitialPermissionIds(new Set());
     } finally {
@@ -199,7 +207,6 @@ export default function UserAdministration() {
       const res = await axiosInstance.get(fetchUrl);
       
       const responseData = res.data?.data; // The pagination object
-      console.log(res)
       if (responseData && Array.isArray(responseData.data)) {
         const newUsers = responseData.data;
         
@@ -249,12 +256,9 @@ export default function UserAdministration() {
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
-    console.log("allRoles",allRoles)
-    console.log("user Permissions",userPermissionIds)
-    // Permissions are loaded via the useEffect triggered by selectedUser change
   };
 
-  const handlePermissionToggle = (permissionId: number, checked: boolean) => {
+  const handlePermissionToggle = useCallback((permissionId: number, checked: boolean) => {
     setUserPermissionIds(prev => {
         const newSet = new Set(prev);
         if (checked) {
@@ -264,7 +268,21 @@ export default function UserAdministration() {
         }
         return newSet;
     });
-  };
+  }, []);
+
+  const handleGroupToggle = useCallback((permissionIds: number[], checked: boolean) => {
+    setUserPermissionIds(prev => {
+        const newSet = new Set(prev);
+        permissionIds.forEach(id => {
+            if (checked) {
+                newSet.add(id);
+            } else {
+                newSet.delete(id);
+            }
+        });
+        return newSet;
+    });
+  }, []);
 
   const handleModifyUser = async () => {
     if (!selectedUser) return;
@@ -285,9 +303,9 @@ export default function UserAdministration() {
         toast.success("User permissions updated successfully");
         setInitialPermissionIds(userPermissionIds); // Reset dirty state
         setIsEditing(false); // Exit edit mode on success
-    } catch (error) {
-        console.error("Failed to update permissions:", error);
-        toast.error("Failed to update user permissions");
+    } catch (error: any) {
+        // console.error("Failed to update permissions:", error.response.data.message);
+        toast.error(error.response.data.message);
     } finally {
         setIsModifying(false);
     }
@@ -470,6 +488,7 @@ export default function UserAdministration() {
                         items={role.permissions}
                         checkedIds={userPermissionIds}
                         onToggle={handlePermissionToggle}
+                        onGroupToggle={handleGroupToggle}
                         className="break-inside-avoid mb-6"
                         disabled={!isEditing}
                     />
@@ -483,11 +502,12 @@ export default function UserAdministration() {
   );
 }
 
-function PermissionSection({
+const PermissionSection = React.memo(function PermissionSection({
   title,
   items,
   checkedIds,
   onToggle,
+  onGroupToggle,
   className = "",
   disabled = false,
 }: {
@@ -495,12 +515,29 @@ function PermissionSection({
   items: Permission[];
   checkedIds: Set<number>;
   onToggle: (id: number, checked: boolean) => void;
+  onGroupToggle: (ids: number[], checked: boolean) => void;
   className?: string;
   disabled?: boolean;
 }) {
+  const allChecked = items && items.length > 0 && items.every(item => checkedIds.has(item.id));
+
   return (
     <div className={`space-y-4 ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2 truncate" title={title}>{title}</h3>
+      <div className="flex items-center gap-2 mb-2">
+        <Checkbox 
+           id={`group-${title}`}
+           className="h-4 w-4 shrink-0"
+           colorClass="data-[state=checked]:bg-green-700 data-[state=checked]:text-white"
+           disabled={disabled}
+           checked={allChecked}
+           onCheckedChange={(checked) => {
+             if (items && items.length > 0) {
+                 onGroupToggle(items.map(i => i.id), checked as boolean);
+             }
+           }}
+        />
+        <h3 className="text-lg font-semibold text-gray-900 truncate" title={title}>{title}</h3>
+      </div>
       <div className="flex flex-col gap-2 space-y-2 bg-[#F2F2F2] p-3 rounded-md">
         {items && items.length > 0 ? (
             items.map((item) => (
@@ -525,4 +562,4 @@ function PermissionSection({
       </div>
     </div>
   );
-}
+});
