@@ -18,6 +18,8 @@ import { CertificateSplitModal } from "@/components/certificate-split-modal";
 import { CertificateUpdateModal } from "@/components/certificate-update-modal";
 import { ShareholderManagementModal } from "@/components/shareholderManagementProps";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 const page = () => {
   const [selectedShareholder, setSelectedShareholder] = useState<any>(null);
@@ -25,6 +27,16 @@ const page = () => {
   const [askModal, setAskModal] = useState(true);
   const [addModal, setAddModal] = useState(false);
   const router = useRouter();
+  const { user, status } = useSelector((state: any) => state.auth);
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (!user?.permissions?.includes("shares.view")) {
+      toast.error("You are not authorized to view this module.");
+      router.push("/dashboard");
+    }
+  }, [user, status, router]);
 
   const handleSelectShareholder = (shareholder: any) => {
     setSelectedShareholder(shareholder);
