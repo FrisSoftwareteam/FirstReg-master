@@ -20,7 +20,7 @@ export default function Dashboard() {
   const auth = useSelector((state: RootState) => state.auth);
   const { status } = auth || { status: "idle" };
 
-  // console.log("auth",auth.user?.permissions)
+  // console.log("auth",auth.user?.roles?.[0]?.name)
 
   useEffect(()=>{
     dispatch(fetchUserProfile());
@@ -91,7 +91,7 @@ export default function Dashboard() {
 
         <div className="mb-4 mx-[28px] flex justify-between items-center">
           <span className="text-[#C10B0B] text-sm font-medium">
-            • Super Admin •
+            • {auth.user?.roles?.[0]?.name || null} •
           </span>
           {/* <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">{user?.email}</span>
