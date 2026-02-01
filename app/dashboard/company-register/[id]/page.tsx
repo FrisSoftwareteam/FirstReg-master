@@ -1,12 +1,14 @@
 "use client"
+// Ifeanyi Ayodeji Ukomadu worked on this
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, X, FileText } from "lucide-react"
+import { FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AddRegisterModal } from "@/components/add-register-modal"
 import { RegisterDetailModal } from "@/components/register-detail-modal"
 import { EditShareholderModal } from "@/components/edit-shareholder-modal"
+import { DividendDeclarationModal } from "@/components/dividend-declaration-modal"
 
 interface Company {
   issuerCode: string
@@ -24,6 +26,7 @@ interface Register {
   shareClass: string
   numberOfHolders: string
   status: "Default" | "Active"
+  taxRate?: string
 }
 
 // Mock data (duplicated for now, optimally should be moved to a shared file or API)
@@ -68,6 +71,7 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
   const [showAddRegister, setShowAddRegister] = useState(false)
   const [showRegisterDetail, setShowRegisterDetail] = useState(false)
   const [showEditShareholder, setShowEditShareholder] = useState(false)
+  const [showDividendDeclaration, setShowDividendDeclaration] = useState(false)
   const [selectedRegister, setSelectedRegister] = useState<Register | null>(null)
 
   const company = companies.find((c) => c.issuerCode === id)
@@ -79,6 +83,7 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
       shareClass: "Ordinary Shares",
       numberOfHolders: "11,323,433.00",
       status: "Default",
+      taxRate: "10%",
     },
     {
       code: "PREF02",
@@ -86,9 +91,10 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
       shareClass: "Preference Register",
       numberOfHolders: "11,323,433.00",
       status: "Active",
+      taxRate: "7.5%",
     },
     {
-      code: "PREF02",
+      code: "AMCON03",
       name: "AMCON Register",
       shareClass: "Preference Register",
       numberOfHolders: "11,323,433.00",
@@ -133,7 +139,11 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
           <Button onClick={() => setShowAddRegister(true)} variant="outline" className="gap-2 rounded-full">
             + Add Register
           </Button>
-          <Button variant="outline" className="gap-2 bg-transparent rounded-full">
+          <Button
+            variant="outline"
+            className="gap-2 bg-transparent rounded-full"
+            onClick={() => setShowDividendDeclaration(true)}
+          >
             Declare Dividend
           </Button>
         </div>
@@ -216,6 +226,13 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
         />
       )}
       {showEditShareholder && <EditShareholderModal onClose={() => setShowEditShareholder(false)} />}
+      {showDividendDeclaration && (
+        <DividendDeclarationModal
+          company={company}
+          registers={registers}
+          onClose={() => setShowDividendDeclaration(false)}
+        />
+      )}
     </div>
   )
 }

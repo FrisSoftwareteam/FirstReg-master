@@ -1,3 +1,4 @@
+/* Ifeanyi Ayodeji Ukomadu worked on this */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -111,4 +112,12 @@ body {
   html {
     -webkit-text-size-adjust: 100%;
   }
+}
+
+.date-input-hide-indicator::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
+.date-input-hide-indicator::-webkit-inner-spin-button {
+  display: none;
 }

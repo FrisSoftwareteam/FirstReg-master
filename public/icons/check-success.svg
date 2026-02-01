@@ -1,0 +1,12 @@
+<!-- Ifeanyi Ayodeji Ukomadu worked on this -->
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="80" cy="80" r="74" fill="#67D64B"/>
+  <circle cx="80" cy="80" r="68" fill="#6FE353"/>
+  <path
+    d="M54 82.5L70.5 99L108.5 61"
+    stroke="#F4F4F4"
+    stroke-width="14"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
