@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace FirstReg.Web
 {
@@ -50,9 +51,19 @@ namespace FirstReg.Web
         public static IReadOnlyList<TeamMember> GetDirectors() => Directors;
         public static IReadOnlyList<TeamMember> GetTeams() => Management;
         public static Team GetTeam() => new(Directors, Management);
-        public static TeamMember GetMember(string id) =>
-            new Team(Directors, Management).List.First(x => string.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
+        public static TeamMember GetMember(string id)
+        {
+            var normalizedId = NormalizeTeamSlug(id);
+            return new Team(Directors, Management).List.First(x => string.Equals(x.Id, normalizedId, StringComparison.OrdinalIgnoreCase));
+        }
         public static IReadOnlyList<Video> GetMedia() => Media;
+
+        public static string NormalizeTeamSlug(string value)
+        {
+            var slug = Clear.Tools.StringUtility.GenerateUrlKey(value ?? string.Empty);
+            slug = Regex.Replace(slug, "[^a-zA-Z0-9-]", string.Empty);
+            return slug.Trim('-').ToLowerInvariant();
+        }
     }
 
     #region models
@@ -83,7 +94,7 @@ namespace FirstReg.Web
         public string Name { get; set; }
         public string Designation { get; set; }
         public string Photo { get; set; }
-        public string Id => Clear.Tools.StringUtility.GenerateUrlKey(Name);
+        public string Id => Tools.NormalizeTeamSlug(Name);
 
         public string Html { get; set; }
     }
