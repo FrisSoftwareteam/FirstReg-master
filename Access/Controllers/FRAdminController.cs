@@ -147,9 +147,16 @@ public class FRAdminController(ILogger<FRAdminController> logger, Service servic
                 var holding = await holdingsQuery
                         .FirstOrDefaultAsync(x => accountCandidates.Contains(x.AccountNo));
 
-                // List is sourced from Shareholders_staging — fall back there when live ShareHoldings has no row.
+                var apiSh = await TryGetUnitsFromApi(regid, accno);
+
+                // Prefer the live register statement (certificates, old cert, narration)
+                // the Access shareholder details page uses. Staging is only a fallback.
                 if (holding == null)
+                {
+                        if (HasRegisterStatement(apiSh))
+                                return apiSh;
                         return await GetShareholderDetailsFromStaging(regid, accno);
+                }
 
                 var model = new RegSH
                 {
@@ -176,7 +183,30 @@ public class FRAdminController(ILogger<FRAdminController> logger, Service servic
 
                 ApplyFullName(model, fullName);
 
-                if (holding.ShareHolderId > 0)
+                if (HasRegisterStatement(apiSh))
+                {
+                        if (!string.IsNullOrWhiteSpace(apiSh.Register))
+                                model.Register = apiSh.Register;
+                        if (!string.IsNullOrWhiteSpace(apiSh.ClearingNo))
+                                model.ClearingNo = DisplayClearingNo(apiSh.ClearingNo);
+                        if (!string.IsNullOrWhiteSpace(apiSh.Address))
+                        {
+                                model.Address1 = apiSh.Address1;
+                                model.Address2 = apiSh.Address2;
+                                model.City = apiSh.City;
+                        }
+                        if (!string.IsNullOrWhiteSpace(apiSh.oldacct))
+                                model.oldacct = apiSh.oldacct;
+                        if (!string.IsNullOrWhiteSpace(apiSh.FullName))
+                                ApplyFullName(model, apiSh.FullName.Trim());
+                        if (apiSh.Units?.Count > 0)
+                                model.Units = apiSh.Units;
+                        if (apiSh.Dividends?.Count > 0)
+                                model.Dividends = apiSh.Dividends;
+                        model.TotalUnits = apiSh.TotalUnits;
+                }
+
+                if (holding.ShareHolderId > 0 && !model.Units.Any())
                 {
                         try
                         {
@@ -228,6 +258,27 @@ public class FRAdminController(ILogger<FRAdminController> logger, Service servic
 
                 return model;
         }
+
+        private async Task<RegSH> TryGetUnitsFromApi(int regid, int accno)
+        {
+                try
+                {
+                        return await apiClient.GetAsync<RegSH>(
+                                $"{apiUrl.GetUnits}/{regid}/{accno}", "", Common.ApiKeyHeader);
+                }
+                catch (Exception ex)
+                {
+                        logger.LogWarning(ex, "eStock API units lookup failed for {Reg}/{Acc}", regid, accno);
+                        return null;
+                }
+        }
+
+        private static bool HasRegisterStatement(RegSH sh) =>
+                sh != null && (
+                        (sh.Units?.Count ?? 0) > 0
+                        || sh.TotalUnits != 0
+                        || !string.IsNullOrWhiteSpace(sh.FullName)
+                        || !string.IsNullOrWhiteSpace(sh.Address));
 
         private async Task<RegSH> GetShareholderDetailsFromStaging(int regid, int accno)
         {

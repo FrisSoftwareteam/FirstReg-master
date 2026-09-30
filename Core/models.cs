@@ -100,6 +100,7 @@ public class RegisterHolderModel
         Register = sh.Register;
         AccountNo = sh.AccountNo;
         ClearingNo = sh.ClearingNo;
+        OldAccountNo = sh.OldAccountNo;
         Name = sh.FullName;
         Gender = sh.Gender;
         Address = sh.Address;
@@ -118,6 +119,7 @@ public class RegisterHolderModel
     public string Register { get; }
     public int AccountNo { get; }
     public string ClearingNo { get; }
+    public string OldAccountNo { get; }
     public string Name { get; }
     public string Gender { get; }
     public string Address { get; }

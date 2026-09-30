@@ -82,109 +82,226 @@
     </div>
 </div>
 
-@if (Model.Transactions.Count() > 0)
-{
-    <div class="card mb-5 bg-transparent shadow-none px-0">
-        <div class="card-header border-0 px-0">
-            <div class="card-title">
-                <h3 class="fw-bolder m-0">Accounts Details</h3>
-            </div>
-        </div>
-        <div class="card-body pt-0 px-0">
-            <table id="tb_transactions" class="table-row-bordered table-row-dashed gy-4 align-middle fw-bolder data-list">
-                <thead class="d-none fs-7 text-gray-400 text-uppercase">
-                    <tr>
-                        <th class="min-w-250px">Reference</th>
-                        <th class="min-w-90px">Units</th>
-                        <th class="min-w-90px">Balance</th>
-                    </tr>
-                </thead>
-                <tbody class="fs-6">
-                    @foreach (var item in Model.Transactions)
-                    {
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="d-flex flex-column justify-content-center">
-                                        <a href="" class="mb-1 fs-5 text-gray-800 text-hover-primary">@item.Reference</a>
-                                        <div class="fw-bold fs-6 text-gray-400">@item.Date.ToString("dd MMM, yyy")</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="d-flex flex-column justify-content-center">
-                                        <div class="mb-1 text-@item.UnitsCSS text-hover-primary">@item.UnitsString</div>
-                                        <div class="fw-bold fs-6 text-gray-400">@item.Description</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="d-flex flex-column justify-content-center">
-                                        <div class="mb-1 text-gray-800 text-hover-primary">@item.Balance.ToString("N2")</div>
-                                        <div class="fw-bold fs-6 text-gray-400">Units left</div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
+@{
+    var statement = ViewBag.Statement as RegisterHolderModel;
+    string Dash(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    var registerName = Dash(statement?.Register ?? Model.Company);
+    var holderName = Dash(statement?.Name ?? Model.Holder);
+    var cscsNo = Dash(statement?.ClearingNo);
+    var accNo = statement != null ? statement.AccountNo.ToString() : Dash(Model.AccountNo);
+    var oldAcc = Dash(statement?.OldAccountNo);
+    var holderAddress = Dash(statement?.Address);
+    var downloadUrl = Url.Action("DownloadAccountDetails", new { no = Model.AccountNo });
 }
 
-@if (Model.Dividends.Count() > 0)
-{
-    <div class="card mb-5 bg-transparent shadow-none px-0">
-        <div class="card-header border-0 px-0">
-            <div class="card-title">
-                <h3 class="fw-bolder m-0">Dividend History</h3>
+<div class="card mb-5 mb-xl-10 print-section">
+    <div class="card-header card-header-stretch">
+        <h3 class="card-title">Shareholder Details</h3>
+        <div class="card-toolbar">
+            <div class="btn-group" role="group">
+                <button type="button" id="tab_btn_cert" class="btn btn-sm btn-primary" onclick="switchTab('kt_tab_pane_7', 'tab_btn_cert', 'tab_btn_divs')">Certificate</button>
+                <button type="button" id="tab_btn_divs" class="btn btn-sm btn-light" onclick="switchTab('kt_tab_pane_8', 'tab_btn_divs', 'tab_btn_cert')">Dividends</button>
             </div>
         </div>
-        <div class="card-body pt-0 px-0">
-            <table id="tb_dividends" class="table-row-bordered table-row-dashed gy-4 align-middle fw-bolder data-list">
-                <thead class="d-none fs-7 text-gray-400 text-uppercase">
-                    <tr>
-                        <th class="min-w-250px">Manager</th>
-                        <th class="min-w-90px">Amount</th>
-                        <th class="min-w-90px">Amount</th>
-                        <th class="min-w-50px text-end">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="fs-6">
-                    @foreach (var item in Model.Dividends)
-                    {
-                        <tr>
-                            <td>
-                                <span class="text-dark-75 font-weight-bolder d-block font-size-h5">@item.Date.ToString("dd MMM yyy")</span>
-                                <small class="text-muted font-weight-normal">Div No: @item.DivNo</small>
-                            </td>
-                            <td>
-                                <span class="text-dark-75 font-weight-bolder d-block font-size-h5">@item.Type</span>
-                                <small class="text-muted font-weight-normal">Warrant No: @item.WarrantNo</small>
-                            </td>
-                            <td>
-                                <span class="text-dark-75 font-weight-bolder d-block font-size-h5">@item.Holding</span>
-                                <small class="text-muted font-weight-normal">units</small>
-                            </td>
-                            <td>
-                                <span class="text-dark-75 font-weight-bolder d-block font-size-h5">@item.Gross.ToString("N2")</span>
-                                <small class="text-muted font-weight-normal">@item.Tax.ToString("N2") tax</small>
-                            </td>
-                            <td>
-                                <span class="text-dark-75 font-weight-bolder d-block font-size-h5">@item.Net.ToString("N2")</span>
-                                <small class="text-muted font-weight-normal">Net</small>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    </div>
+    <div class="card-body">
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="kt_tab_pane_7" role="tabpanel">
+                <div class="d-flex flex-wrap flex-stack mb-7">
+                    <div class="d-flex flex-column flex-wrap align-items-start my-1">
+                        <h1 class="page-header-title">Statement of account as at @DateTime.Now.ToString("dd-MMM-yyyy")</h1>
+                    </div>
+                    <div class="d-flex flex-wrap my-1 no-print">
+                        <a href="@downloadUrl" class="btn btn-dark btn-active-dark ms-1">Export</a>
+                        <button type="button" class="btn btn-dark btn-active-dark ms-1" onclick="window.print()">Print</button>
+                        <a asp-action="Details" asp-route-code="@Model.ShareholderCode" class="btn btn-danger btn-active-dark ms-1">Close</a>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap">
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Register:</div>
+                        <div class="fs-5 fw-bold">@registerName</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Name:</div>
+                        <div class="fs-5 fw-bold">@holderName</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">CSCS No:</div>
+                        <div class="fs-5 fw-bold">@cscsNo</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Acc No:</div>
+                        <div class="fs-5 fw-bold">@accNo</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Old Acc:</div>
+                        <div class="fs-5 fw-bold">@oldAcc</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Address:</div>
+                        <div class="fs-5 fw-bold">@holderAddress</div>
+                    </div>
+                </div>
+
+                @if (statement != null && statement.Units.Any())
+                {
+                    decimal runningBalance = 0;
+                    int sn = 0;
+                    <div class="table-responsive mt-5">
+                        <table class="table table-striped fs-6 fw-bold gy-3 gs-5">
+                            <thead>
+                                <tr class="fw-bolder fs-6 text-dark border-bottom border-gray-200">
+                                    <th>S/N</th>
+                                    <th>Cert. No</th>
+                                    <th>Old Cert. No</th>
+                                    <th>Trans Date</th>
+                                    <th>Narration</th>
+                                    <th class="text-end">Buy</th>
+                                    <th class="text-end">Sell</th>
+                                    <th class="text-end">Balance</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var unit in statement.Units)
+                                {
+                                    sn++;
+                                    var buy = unit.TotalUnits > 0 ? unit.TotalUnits : 0;
+                                    var sell = unit.TotalUnits < 0 ? Math.Abs(unit.TotalUnits) : 0;
+                                    runningBalance += buy - sell;
+                                    <tr>
+                                        <td>@sn</td>
+                                        <td>@(unit.CertNo > 0 ? unit.CertNo.ToString() : "-")</td>
+                                        <td>@Dash(unit.OldCertNo)</td>
+                                        <td>@Dash(unit.Date)</td>
+                                        <td>@Dash(string.IsNullOrWhiteSpace(unit.Narration) ? unit.Description : unit.Narration)</td>
+                                        <td class="text-end">@(buy > 0 ? buy.ToString("N0") : "-")</td>
+                                        <td class="text-end">@(sell > 0 ? sell.ToString("N0") : "-")</td>
+                                        <td class="text-end">@runningBalance.ToString("N0")</td>
+                                        <td class="text-center">@Dash(unit.Status)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bolder">
+                                    <th colspan="7" class="text-end">Balance:</th>
+                                    <th class="text-end">@statement.TotalUnits.ToString("N0")</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-gray-600 fs-6 mt-4">No certificate statement is available for this account.</div>
+                }
+            </div>
+
+            <div class="tab-pane fade" id="kt_tab_pane_8" role="tabpanel">
+                <div class="d-flex flex-wrap flex-stack mb-7">
+                    <div class="d-flex flex-column flex-wrap align-items-start my-1">
+                        <h1 class="page-header-title">Dividend history as at @DateTime.Now.ToString("dd-MMM-yyyy")</h1>
+                    </div>
+                    <div class="d-flex flex-wrap my-1 no-print">
+                        <a href="@downloadUrl" class="btn btn-dark btn-active-dark ms-1">Export</a>
+                        <button type="button" class="btn btn-dark btn-active-dark ms-1" onclick="window.print()">Print</button>
+                        <a asp-action="Details" asp-route-code="@Model.ShareholderCode" class="btn btn-danger btn-active-dark ms-1">Close</a>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap">
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Register:</div>
+                        <div class="fs-5 fw-bold">@registerName</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Name:</div>
+                        <div class="fs-5 fw-bold">@holderName</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">CSCS No:</div>
+                        <div class="fs-5 fw-bold">@cscsNo</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Acc No:</div>
+                        <div class="fs-5 fw-bold">@accNo</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Old Acc:</div>
+                        <div class="fs-5 fw-bold">@oldAcc</div>
+                    </div>
+                    <div class="min-w-75px pe-4 me-6 mb-3">
+                        <div class="fw-semibold fs-6 text-gray-400">Address:</div>
+                        <div class="fs-5 fw-bold">@holderAddress</div>
+                    </div>
+                </div>
+
+                @if (statement != null && statement.Dividends.Any())
+                {
+                    int dsn = 0;
+                    <div class="table-responsive mt-5">
+                        <table class="table table-striped fs-6 fw-bold gy-3 gs-5">
+                            <thead>
+                                <tr class="fw-bolder fs-6 text-dark border-bottom border-gray-200">
+                                    <th>S/N</th>
+                                    <th>Date</th>
+                                    <th>Date Paid</th>
+                                    <th>Div. No</th>
+                                    <th>Warr. No</th>
+                                    <th>Type</th>
+                                    <th class="text-end">Units</th>
+                                    <th class="text-end">Gross</th>
+                                    <th class="text-end">Tax</th>
+                                    <th class="text-end">Net</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var div in statement.Dividends)
+                                {
+                                    dsn++;
+                                    <tr>
+                                        <td>@dsn</td>
+                                        <td>@Dash(div.Date)</td>
+                                        <td>@Dash(div.DatePaid)</td>
+                                        <td>@(div.DividendNo > 0 ? div.DividendNo.ToString() : "-")</td>
+                                        <td>@(div.WarrantNo > 0 ? div.WarrantNo.ToString() : "-")</td>
+                                        <td>@Dash(div.Type)</td>
+                                        <td class="text-end">@(div.Total.HasValue ? div.Total.Value.ToString("N0") : "-")</td>
+                                        <td class="text-end">@(div.Gross.HasValue ? div.Gross.Value.ToString("N2") : "-")</td>
+                                        <td class="text-end">@(div.Tax.HasValue ? div.Tax.Value.ToString("N2") : "-")</td>
+                                        <td class="text-end">@(div.Net.HasValue ? div.Net.Value.ToString("N2") : "-")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-gray-600 fs-6 mt-4">No dividend history is available for this account.</div>
+                }
+            </div>
         </div>
     </div>
-}
+</div>
 
 @section scripts {
     <script src="~/pages/acc-details.js" asp-append-version="true"></script>
+    <script>
+        function switchTab(paneId, activeBtn, inactiveBtn) {
+            document.querySelectorAll('#myTabContent .tab-pane').forEach(function (p) {
+                p.classList.remove('show', 'active');
+            });
+            var pane = document.getElementById(paneId);
+            if (pane) { pane.classList.add('show', 'active'); }
+
+            var ab = document.getElementById(activeBtn);
+            var ib = document.getElementById(inactiveBtn);
+            if (ab) { ab.classList.replace('btn-light', 'btn-primary'); }
+            if (ib) { ib.classList.replace('btn-primary', 'btn-light'); }
+        }
+    </script>
 } 

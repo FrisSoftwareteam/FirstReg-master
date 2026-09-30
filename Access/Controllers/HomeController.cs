@@ -230,7 +230,7 @@ public class HomeController : Controller
     {
         try
         {
-            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name);
+            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name.ToLower());
 
             switch (user.Type)
             {
@@ -286,7 +286,7 @@ public class HomeController : Controller
     {
         try
         {
-            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name);
+            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name.ToLower());
             if (user.Type != UserType.FRAdmin)
             {
                 TempData["error"] = "You are not authorized to see this page";

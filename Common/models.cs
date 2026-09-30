@@ -130,6 +130,10 @@ namespace FirstReg
 
         public decimal TotalUnits { get; set; }
 
+        /// <summary>Mapped from ___RHoldings.oldacct when present.</summary>
+        public string oldacct { get; set; }
+        public string OldAccountNo => string.IsNullOrWhiteSpace(oldacct) ? null : oldacct.Trim();
+
         public List<Bson.Unit> Units { get; set; }
         public List<Bson.Dividend> Dividends { get; set; }
 

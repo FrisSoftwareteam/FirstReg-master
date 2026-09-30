@@ -165,6 +165,17 @@ public class AppDB : IdentityDbContext<User, Role, int>
         modelBuilder.Entity<Shareholder>(entity =>
         {
             entity.Property(e => e.CreatedOn).HasDefaultValueSql("GETDATE()");
+            entity.ToTable("Shareholders");
+            entity.HasOne(e => e.Documents)
+                .WithOne()
+                .HasForeignKey<ShareholderDocuments>(d => d.Id);
+        });
+
+        // Table splitting: the image columns share the Shareholders row.
+        modelBuilder.Entity<ShareholderDocuments>(entity =>
+        {
+            entity.ToTable("Shareholders");
+            entity.HasKey(d => d.Id);
         });
 
         modelBuilder.Entity<ShareHolding>(entity =>

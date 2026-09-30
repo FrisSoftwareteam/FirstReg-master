@@ -908,6 +908,10 @@ public static class Tools
         foreach (var h in sh.Holdings)
         {
             var keep = entries.Any(e => e.RegisterId == h.RegisterId && SameShareAccountNo(h.AccountNo, e.Acc));
+            // A visible holding the admin removed: hide it and drop it back to Pending, so the
+            // "keep verified holdings visible" refreshes (Admin Details, Access dashboard) don't restore it.
+            if (!keep && !h.Hidden && h.Status == ShareHoldingStatus.Verified)
+                h.Status = ShareHoldingStatus.Pending;
             h.Hidden = !keep;
         }
 
@@ -935,8 +939,8 @@ public static class Tools
             });
         }
 
-        if (entries.Count > 0)
-            sh.AccountNo = entries[0].Acc;
+        // All registers removed: clear the account number typed at signup too.
+        sh.AccountNo = entries.Count > 0 ? entries[0].Acc : null;
     }
 
     /// <summary>
@@ -1329,6 +1333,155 @@ WHERE account_no = @acc AND reg_code = @reg AND ISNULL(certificate_status, 0) = 
             .Select(k => new ShareHolding { AccountNo = k.Acc.ToString(), RegisterId = k.Reg })
             .ToList();
         return await FindLiveRegisterHoldings(holdings, data);
+    }
+
+    /// <summary>
+    /// CHN update (Admin): find the shareholder's investments by clearing number only.
+    /// Every register account carrying one of the CHNs becomes the visible investment list
+    /// (the account/holder name is not checked); other visible holdings are removed (hidden and set back to Pending).
+    /// If nothing matches, the existing list is left unchanged. Returns the number of matches.
+    /// </summary>
+    public static async Task<int> AttachHoldingsFromChn(Shareholder sh, FirstReg.Services.DataService data)
+    {
+        if (sh == null)
+            return 0;
+        sh.Holdings ??= new HashSet<ShareHolding>();
+
+        var chns = ParseClearingNos(sh.ClearingNo).Where(IsRealClearingNo).ToList();
+        if (chns.Count == 0)
+            return 0;
+
+        var matched = new List<ShareholderStaging>();
+        foreach (var chn in chns)
+            matched.AddRange(await FindLiveRegisterHoldingsByChn(chn, data));
+
+        // Staging copy as a fallback for registers the live lookup didn't return.
+        var staging = await data.Find<ShareholderStaging>(x => chns.Contains(x.ClearingNo));
+        foreach (var row in staging)
+        {
+            if (matched.Any(m => m.RegisterCode == row.RegisterCode && m.AccountNumber == row.AccountNumber))
+                continue;
+            matched.Add(row);
+        }
+
+        matched = matched
+            .Where(m => IsCertificateRegister(m.RegisterCode))
+            .GroupBy(m => (m.RegisterCode, m.AccountNumber))
+            .Select(g => g.First())
+            .ToList();
+
+        if (matched.Count == 0)
+            return 0;
+
+        bool IsMatch(ShareHolding h) => matched.Any(m =>
+            m.RegisterCode == h.RegisterId && SameShareAccountNo(h.AccountNo, m.AccountNumber.ToString()));
+
+        foreach (var h in sh.Holdings)
+        {
+            if (IsMatch(h))
+                continue;
+            if (!h.Hidden && h.Status == ShareHoldingStatus.Verified)
+                h.Status = ShareHoldingStatus.Pending;
+            h.Hidden = true;
+        }
+
+        var stamp = sh.Holdings.Count > 0 ? sh.Holdings.Min(h => h.Date) : Now;
+        // Stamp the profile name: Access and Admin treat holdings carrying the profile name as the
+        // shareholder's confirmed accounts, so they stay visible for unverified profiles too.
+        var holderName = string.IsNullOrWhiteSpace(sh.FullName) ? null : sh.FullName.Trim();
+        foreach (var m in matched)
+        {
+            var acc = m.AccountNumber.ToString();
+            var units = ParseStagingHoldings(m.Holdings);
+            var existing = sh.Holdings.FirstOrDefault(h =>
+                h.RegisterId == m.RegisterCode && SameShareAccountNo(h.AccountNo, acc));
+            if (existing != null)
+            {
+                existing.Hidden = false;
+                existing.AccountNo = acc;
+                existing.AccountName = holderName ?? m.Names;
+                existing.Units = units;
+                if (sh.Verified)
+                    existing.Status = ShareHoldingStatus.Verified;
+                continue;
+            }
+
+            sh.Holdings.Add(new ShareHolding
+            {
+                Date = stamp,
+                RegisterId = m.RegisterCode,
+                AccountNo = acc,
+                AccountName = holderName ?? m.Names,
+                Units = units,
+                Status = sh.Verified ? ShareHoldingStatus.Verified : ShareHoldingStatus.Pending
+            });
+        }
+
+        return matched.Count;
+    }
+
+    /// <summary>All live register accounts (any register) carrying this CHN, with their units.</summary>
+    static async Task<List<ShareholderStaging>> FindLiveRegisterHoldingsByChn(string chn, FirstReg.Services.DataService data)
+    {
+        var results = new List<ShareholderStaging>();
+        var estockCs = EstockConnectionString(data);
+        if (string.IsNullOrWhiteSpace(estockCs) || !IsRealClearingNo(chn))
+            return results;
+
+        try
+        {
+            await using var conn = new SqlConnection(estockCs);
+            await conn.OpenAsync();
+            await using var cmd = new SqlCommand(@"
+SELECT Acctno, regcode,
+    LTRIM(RTRIM(CONCAT(
+        ISNULL(last_nm, ''), ' ',
+        ISNULL(first_nm, ''), ' ',
+        ISNULL(middle_nm, '')
+    ))) AS Names,
+    LTRIM(RTRIM(ISNULL(chn, ''))) AS ClearingNo
+FROM T_shold WITH (NOLOCK)
+WHERE chn = @chn", conn)
+            {
+                CommandTimeout = 60
+            };
+            cmd.Parameters.AddWithValue("@chn", chn.Trim());
+
+            var pending = new List<(int Acc, int Reg, string Names, string ClearingNo)>();
+            await using (var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    pending.Add((
+                        reader.GetInt32(0),
+                        Convert.ToInt32(reader.GetValue(1)),
+                        reader.IsDBNull(2) ? "" : reader.GetString(2),
+                        reader.IsDBNull(3) ? "" : reader.GetString(3)
+                    ));
+                }
+            }
+
+            foreach (var row in pending.GroupBy(x => (x.Acc, x.Reg)).Select(g => g.First()))
+            {
+                decimal units = 0m;
+                try { units = await LiveRegisterUnits(conn, row.Acc, row.Reg); }
+                catch { /* keep 0 */ }
+
+                results.Add(new ShareholderStaging
+                {
+                    AccountNumber = row.Acc,
+                    RegisterCode = row.Reg,
+                    Names = row.Names,
+                    ClearingNo = row.ClearingNo,
+                    Holdings = units.ToString()
+                });
+            }
+        }
+        catch
+        {
+            // Live register unreachable: the caller still uses the staging copy.
+        }
+        return results;
     }
 
     static async Task<List<ShareholderStaging>> FindLiveRegisterHoldingsByChnAndAccount(

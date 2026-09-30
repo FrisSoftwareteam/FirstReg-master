@@ -124,7 +124,7 @@ let ViewShareholderDetails = (id, accno) => {
 
             $('#sp_acc').html(json.accountNo);
             $('#sp_cscs').html(json.clearingNo);
-            $('#sp_oldacc').html('');
+            $('#sp_oldacc').html(json.oldAccountNo || '-');
             $('#sp_address').html(json.address);
 
             $('#sp_phone').html(json.phone);
@@ -149,8 +149,8 @@ let ViewShareholderDetails = (id, accno) => {
                 $('#t_body').append(
                     `<tr>
                         <td>${index}</td>
-                        <td>${unit.certNo ?? '-'}</td>
-                        <td>${unit.oldCertNo ?? '-'}</td>
+                        <td>${unit.certNo ? unit.certNo : '-'}</td>
+                        <td>${unit.oldCertNo || '-'}</td>
                         <td>${unit.date}</td>
                         <td>${unit.narration ?? '-'}</td>
                         <td class="text-end">${credit > 0 ? credit.toLocaleString() : '-'}</td>

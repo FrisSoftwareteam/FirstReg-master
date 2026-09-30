@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace FirstReg.OnlineAccess
 {
@@ -46,6 +47,13 @@ namespace FirstReg.OnlineAccess
                     Console.WriteLine("Config: env vars");
                     config.AddEnvironmentVariables();
                     Console.WriteLine("Config: done");
+                })
+                .ConfigureLogging((context, logging) =>
+                {
+                    // WebHostBuilder (unlike CreateDefaultBuilder) registers no log providers,
+                    // so every ILogger call was silently dropped. Send logs to the console.
+                    logging.AddConfiguration(context.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
                 })
                 .ConfigureServices((context, services) =>
                 {

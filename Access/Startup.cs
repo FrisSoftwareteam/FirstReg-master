@@ -32,7 +32,8 @@ public class Startup
         Console.WriteLine("Startup: registering DbContext");
         services.AddDbContext<AppDB>(options =>
         {
-            options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+                sql => sql.CommandTimeout(120));
         });
 
         Console.WriteLine("Startup: registering MongoClient");

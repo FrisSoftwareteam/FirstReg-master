@@ -205,12 +205,28 @@
                 var missPassport = false;
                 var missSignature = false;
                 var holderCount = 0;
-                foreach (var holder in user.VisibleShareholders)
+                // Ask the database whether each image is present, without downloading the images.
+                var holderIds = user.VisibleShareholders.Select(x => x.Id).ToList();
+                holderCount = holderIds.Count;
+                if (holderCount > 0)
                 {
-                    holderCount++;
-                    if (!holder.HasPhoto) missPhoto = true;
-                    if (!holder.HasPassport) missPassport = true;
-                    if (!holder.HasSignatureDoc) missSignature = true;
+                    var docFlags = service.Data.GetAsQueryable<ShareholderDocuments>()
+                        .Where(d => holderIds.Contains(d.Id))
+                        .Select(d => new
+                        {
+                            HasPhoto = d.Photo != null && d.Photo != "",
+                            HasPassport = d.Passport != null && d.Passport != "",
+                            HasSignature = d.Signature != null && d.Signature != ""
+                        })
+                        .ToList();
+                    // Profiles with no images at all have no Documents row in the model.
+                    if (docFlags.Count < holderCount) { missPhoto = missPassport = missSignature = true; }
+                    foreach (var f in docFlags)
+                    {
+                        if (!f.HasPhoto) missPhoto = true;
+                        if (!f.HasPassport) missPassport = true;
+                        if (!f.HasSignature) missSignature = true;
+                    }
                 }
 
                 if (holderCount > 0 && (missPhoto || missPassport || missSignature))

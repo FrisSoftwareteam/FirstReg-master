@@ -171,7 +171,7 @@ function setAccountStatement(json, url, reg, accno) {
 
     $('#sp_acc').html(json.accountNo);
     $('#sp_cscs').html(displayCscs(json.clearingNo));
-    $('#sp_oldacc').html('');
+    $('#sp_oldacc').html(json.oldAccountNo || '-');
     $('#sp_address').html(json.address);
 
     $('#sp_phone').html(json.phone);
@@ -196,8 +196,8 @@ function setAccountStatement(json, url, reg, accno) {
         $('#t_body').append(
             `<tr>
                 <td>${index}</td>
-                <td>${unit.certNo ?? '-'}</td>
-                <td>${unit.oldCertNo ?? '-'}</td>
+                        <td>${unit.certNo ? unit.certNo : '-'}</td>
+                        <td>${unit.oldCertNo || '-'}</td>
                 <td>${unit.date}</td>
                 <td>${unit.narration ?? '-'}</td>
                 <td class="text-end">${credit > 0 ? credit.toLocaleString() : '-'}</td>
@@ -232,7 +232,7 @@ function setDividendHistory(json, url, reg, accno) {
 
     $('#sp_divs_acc').html(json.accountNo);
     $('#sp_divs_cscs').html(displayCscs(json.clearingNo));
-    $('#sp_divs_oldacc').html('');
+    $('#sp_divs_oldacc').html(json.oldAccountNo || '-');
     $('#sp_divs_address').html(json.address);
 
     $('#sp_divs_phone').html(json.phone);
