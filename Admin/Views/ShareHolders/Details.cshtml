@@ -6,6 +6,10 @@
     var accnoRows = Model.VisibleHoldings.Any()
         ? Model.VisibleHoldings.Select(h => (RegisterId: h.RegisterId, AccountNo: h.AccountNo)).ToList()
         : new List<(int RegisterId, string AccountNo)> { (0, Model.DisplayAccountNo) };
+    var docs = (ViewBag.Docs as FirstReg.Admin.Controllers.ShareholderDocFlags) ?? new FirstReg.Admin.Controllers.ShareholderDocFlags();
+    var photoUrl = Url.Action("ShareholderDocument", "ShareHolders", new { id = Model.Id, kind = "photo" });
+    var passportUrl = Url.Action("ShareholderDocument", "ShareHolders", new { id = Model.Id, kind = "passport" });
+    var signatureUrl = Url.Action("ShareholderDocument", "ShareHolders", new { id = Model.Id, kind = "signature" });
     var chnRows = Model.DisplayClearingNos.Any()
         ? Model.DisplayClearingNos.ToList()
         : new List<string> { "" };
@@ -19,9 +23,9 @@
                     <div class="card-body pt-15 pb-3">
                         <div class="d-flex flex-center flex-column mb-5">
                             <div class="symbol symbol-100px symbol-circle mb-7">
-                                @if (!string.IsNullOrWhiteSpace(Model.Photo))
+                                @if (docs.HasPhoto)
                                 {
-                                    <img src="@Model.Photo" alt="Profile picture" />
+                                    <img src="@photoUrl" loading="lazy" alt="Profile picture" />
                                 }
                                 else
                                 {
@@ -128,9 +132,9 @@
                     <div class="card-body pt-2">
                         <div class="fw-bolder mb-2">Profile picture</div>
                         <div class="py-3">
-                            @if (!string.IsNullOrWhiteSpace(Model.Photo))
+                            @if (docs.HasPhoto)
                             {
-                                <img src="@Model.Photo" class="w-100" alt="Profile picture" />
+                                <img src="@photoUrl" loading="lazy" class="w-100" alt="Profile picture" />
                             }
                             else
                             {
@@ -139,15 +143,15 @@
                         </div>
                         <div class="fw-bolder mt-5 mb-2">Passport / NIN</div>
                         <div class="py-3">
-                            @if (!string.IsNullOrWhiteSpace(Model.Passport))
+                            @if (docs.HasPassport)
                             {
-                                if (Model.Passport.StartsWith("data:application/pdf"))
+                                if (docs.PassportIsPdf)
                                 {
-                                    <a href="@Model.Passport" target="_blank" class="fw-bold">Open PDF</a>
+                                    <a href="@passportUrl" target="_blank" class="fw-bold">Open PDF</a>
                                 }
                                 else
                                 {
-                                    <img src="@Model.Passport" class="w-100 js-doc-zoom" alt="Passport / NIN" title="Click to enlarge and rotate" />
+                                    <img src="@passportUrl" loading="lazy" class="w-100 js-doc-zoom" alt="Passport / NIN" title="Click to enlarge and rotate" />
                                 }
                             }
                             else
@@ -157,9 +161,9 @@
                         </div>
                         <div class="fw-bolder mt-5 mb-2">Signature</div>
                         <div class="py-3">
-                            @if (!string.IsNullOrWhiteSpace(Model.Signature))
+                            @if (docs.HasSignature)
                             {
-                                <img src="@Model.Signature" class="w-100" alt="Signature" />
+                                <img src="@signatureUrl" loading="lazy" class="w-100" alt="Signature" />
                             }
                             else
                             {
@@ -508,7 +512,7 @@
                                         </label>
                                     </div>
                                     <div class="mt-3 bg-gray-200">
-                                        <img src="@Model.Signature" class="w-100" />
+                                        <img src="@signatureUrl" loading="lazy" class="w-100" />
                                     </div>
                                 </div>
                             </div>

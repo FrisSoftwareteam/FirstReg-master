@@ -35,7 +35,7 @@ namespace FirstReg.Admin
 
             services.AddDbContext<AppDB>(options => options.UseLazyLoadingProxies().UseSqlServer(
                 Configuration.GetConnectionString("DefaultConnection"),
-                sql => sql.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null)));
+                sql => sql.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null).CommandTimeout(120)));
 
             services.AddSingleton<IMongoClient, MongoClient>(s =>
             {

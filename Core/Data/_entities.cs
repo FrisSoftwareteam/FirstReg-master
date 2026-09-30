@@ -44,6 +44,24 @@ public partial class UserRole : IdentityUserRole<int>
 
 #region real deal
 
+/// <summary>
+/// The image columns of dbo.Shareholders (same table and row as Shareholder).
+/// Loaded lazily through Shareholder.Documents.
+/// </summary>
+public class ShareholderDocuments
+{
+    public int Id { get; set; }
+
+    [Column(TypeName = "varchar(MAX)")]
+    public string Signature { get; set; }
+
+    [Column(TypeName = "varchar(MAX)")]
+    public string Photo { get; set; }
+
+    [Column(TypeName = "varchar(MAX)")]
+    public string Passport { get; set; }
+}
+
 public partial class Shareholder
 {
     public Shareholder()
@@ -98,14 +116,31 @@ public partial class Shareholder
     public DateTime? ExpiryDate { get; set; }
 
 
-    [Column(TypeName = "varchar(MAX)")]
-    public string Signature { get; set; }
+    // Signature, Photo and Passport are large base64 images stored in this same table.
+    // They live on ShareholderDocuments (same row, "table splitting") so ordinary queries
+    // no longer download them; they load only when one of these properties is read.
+    public virtual ShareholderDocuments Documents { get; set; }
 
-    [Column(TypeName = "varchar(MAX)")]
-    public string Photo { get; set; }
+    [NotMapped]
+    public string Signature
+    {
+        get => Documents?.Signature;
+        set { if (Documents == null) { if (value == null) return; Documents = new ShareholderDocuments { Id = Id }; } Documents.Signature = value; }
+    }
 
-    [Column(TypeName = "varchar(MAX)")]
-    public string Passport { get; set; }
+    [NotMapped]
+    public string Photo
+    {
+        get => Documents?.Photo;
+        set { if (Documents == null) { if (value == null) return; Documents = new ShareholderDocuments { Id = Id }; } Documents.Photo = value; }
+    }
+
+    [NotMapped]
+    public string Passport
+    {
+        get => Documents?.Passport;
+        set { if (Documents == null) { if (value == null) return; Documents = new ShareholderDocuments { Id = Id }; } Documents.Passport = value; }
+    }
 
     public bool Verified { get; set; }
 

@@ -68,6 +68,46 @@ namespace FirstReg.Admin.Controllers
             Url.Action(nameof(SwitchGroup)),
         });
 
+        /// <summary>
+        /// Streams one stored document (photo, passport or signature) for a shareholder,
+        /// reading only that column so the Details page itself loads immediately.
+        /// </summary>
+        [Route("document/{id:int}/{kind}")]
+        [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Client)]
+        public async Task<IActionResult> ShareholderDocument(int id, string kind)
+        {
+            var q = _service.Data.GetAsQueryable<ShareholderDocuments>().AsNoTracking().Where(d => d.Id == id);
+            string value = (kind ?? "").ToLowerInvariant() switch
+            {
+                "photo" => await q.Select(d => d.Photo).FirstOrDefaultAsync(),
+                "passport" => await q.Select(d => d.Passport).FirstOrDefaultAsync(),
+                "signature" => await q.Select(d => d.Signature).FirstOrDefaultAsync(),
+                _ => null
+            };
+            if (string.IsNullOrWhiteSpace(value))
+                return NotFound();
+
+            var contentType = "image/png";
+            var data = value.Trim();
+            if (data.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            {
+                var comma = data.IndexOf(',');
+                if (comma < 0) return NotFound();
+                var header = data.Substring(5, comma - 5); // e.g. image/jpeg;base64
+                var semi = header.IndexOf(';');
+                contentType = semi >= 0 ? header.Substring(0, semi) : header;
+                data = data.Substring(comma + 1);
+            }
+            try
+            {
+                return File(Convert.FromBase64String(data), string.IsNullOrWhiteSpace(contentType) ? "image/png" : contentType);
+            }
+            catch (FormatException)
+            {
+                return NotFound();
+            }
+        }
+
         [Route("details/{code}")]
         public async Task<IActionResult> Details(string code)
         {
@@ -94,6 +134,20 @@ namespace FirstReg.Admin.Controllers
                     .Where(x => Tools.IsCertificateRegister(x.Id))
                     .OrderBy(x => x.Name)
                     .ToList();
+
+                // Which documents exist, worked out by the database without downloading them.
+                // The images themselves load separately through ShareholderDocument().
+                var shId = sh.Id;
+                ViewBag.Docs = await _service.Data.GetAsQueryable<ShareholderDocuments>()
+                    .Where(d => d.Id == shId)
+                    .Select(d => new ShareholderDocFlags
+                    {
+                        HasPhoto = d.Photo != null && d.Photo != "",
+                        HasPassport = d.Passport != null && d.Passport != "",
+                        PassportIsPdf = d.Passport != null && d.Passport.StartsWith("data:application/pdf"),
+                        HasSignature = d.Signature != null && d.Signature != ""
+                    })
+                    .FirstOrDefaultAsync() ?? new ShareholderDocFlags();
 
                 return View(sh);
             }
@@ -534,10 +588,13 @@ namespace FirstReg.Admin.Controllers
 
                 try
                 {
-                    var matched = await Tools.AttachHoldingsFromChnAndAccountNo(sh, _service.Data);
+                    // Investments come from the CHN only (not the account or holder name).
+                    var matched = await Tools.AttachHoldingsFromChn(sh, _service.Data);
                     await _service.Data.UpdateAsync(sh);
                     if (matched == 0)
-                        TempData["warning"] = "Clearing number was saved. Add a registrar and account number to look up holdings. Search uses CHN and account number, not name.";
+                        TempData["warning"] = "Clearing number was saved, but no register account was found with this CHN. The investments were left unchanged.";
+                    else
+                        TempData["success"] = $"Clearing number saved. Found {matched} investment{(matched == 1 ? "" : "s")} for this CHN.";
                 }
                 catch (Exception vex)
                 {
@@ -573,15 +630,14 @@ namespace FirstReg.Admin.Controllers
                 for (var i = 0; i < count; i++)
                     entries.Add((ids[i], numbers[i]));
 
-                if (entries.Count == 0)
-                    throw new InvalidOperationException("Add at least one registrar and account number.");
-
                 Tools.ApplyRegisteredAccounts(sh, entries);
                 if (!sh.Verified)
                     Tools.RestrictUnverifiedHoldingsToRegistration(sh);
                 await _service.Data.UpdateAsync(sh);
 
-                TempData["success"] = "Registers and account numbers were successfully updated";
+                TempData["success"] = entries.Count == 0
+                    ? "All registers and account numbers were removed"
+                    : "Registers and account numbers were successfully updated";
             }
             catch (Exception ex)
             {
@@ -692,6 +748,9 @@ namespace FirstReg.Admin.Controllers
                     throw new InvalidOperationException("Shareholder account was not found, please try again.");
 
                 holding.Hidden = true;
+                // Drop back to Pending so the refresh that re-shows verified holdings doesn't restore it.
+                if (holding.Status == ShareHoldingStatus.Verified)
+                    holding.Status = ShareHoldingStatus.Pending;
                 await _service.Data.UpdateAsync(holding);
 
                 if (!string.IsNullOrWhiteSpace(holding.Shareholder?.Code))
@@ -866,7 +925,7 @@ namespace FirstReg.Admin.Controllers
                 !x.Hidden &&
                 (x.Verified ||
                 x.ActionRequired ||
-                (x.Signature != null && x.Signature != "")));
+                (x.Documents.Signature != null && x.Documents.Signature != "")));
 
             // Unverified accounts older than 14 days stay off these lists.
             var pendingCutoff = Tools.Now.Date.AddDays(-14);
@@ -1044,5 +1103,13 @@ namespace FirstReg.Admin.Controllers
             public bool IsSubscribed { get; set; }
             public int Id { get; set; }
         }
+    }
+
+    public class ShareholderDocFlags
+    {
+        public bool HasPhoto { get; set; }
+        public bool HasPassport { get; set; }
+        public bool PassportIsPdf { get; set; }
+        public bool HasSignature { get; set; }
     }
 }

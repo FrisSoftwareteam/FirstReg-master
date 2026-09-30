@@ -110,8 +110,7 @@ $('#bt_add_accno_row').on('click', function () {
 });
 
 $('#accno_rows').on('click', '.bt-remove-accno-row', function () {
-    if ($('#accno_rows .accno-row').length < 2)
-        return;
+    // Every row can be removed; submitting with none clears all registers.
     $(this).closest('.accno-row').remove();
 });
 
