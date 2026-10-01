@@ -84,6 +84,7 @@
 
 @{
     var statement = ViewBag.Statement as RegisterHolderModel;
+    var statementFailed = ViewBag.StatementFailed as bool? ?? false;
     string Dash(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
     var registerName = Dash(statement?.Register ?? Model.Company);
     var holderName = Dash(statement?.Name ?? Model.Holder);
@@ -193,6 +194,20 @@
                             </tfoot>
                         </table>
                     </div>
+                }
+                else if (statementFailed)
+                {
+                    <div class="alert alert-warning d-flex flex-column flex-sm-row align-items-sm-center gap-3 mt-4 no-print">
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">The statement could not be loaded right now.</div>
+                            <div class="fs-7">The register records service took too long to respond. Please try again in a moment.</div>
+                        </div>
+                        <a href="@Context.Request.Path" class="btn btn-sm btn-warning">Try again</a>
+                    </div>
+                }
+                else if (statement == null)
+                {
+                    <div class="text-gray-600 fs-6 mt-4">No register record was found for this account. Please contact First Registrars to confirm the account details.</div>
                 }
                 else
                 {
