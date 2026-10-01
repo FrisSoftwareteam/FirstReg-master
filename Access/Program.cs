@@ -41,7 +41,9 @@ namespace FirstReg.OnlineAccess
                     Console.WriteLine("Config: SetBasePath");
                     config.SetBasePath(Directory.GetCurrentDirectory());
                     Console.WriteLine("Config: appsettings.json");
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    // optional: appsettings*.json are git-ignored (they hold secrets), so CI builds ship without them.
+                    // On Azure every value comes from App settings / Connection strings instead.
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                     Console.WriteLine("Config: env appsettings");
                     config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
                     Console.WriteLine("Config: env vars");
