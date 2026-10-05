@@ -405,7 +405,7 @@ public static class Tools
 
         index += 1;
         sheet.Cell(index, 2).Value = "Old Acc No";
-        sheet.Cell(index, 3).Value = "";
+        sheet.Cell(index, 3).Value = string.IsNullOrWhiteSpace(model.OldAccountNo) ? "-" : model.OldAccountNo;
 
         index += 1;
         sheet.Cell(index, 2).Value = "Address";
@@ -478,7 +478,7 @@ public static class Tools
 
         index += 1;
         sl.Cell(index, 2).Value = "Old Acc No";
-        sl.Cell(index, 3).Value = "";
+        sl.Cell(index, 3).Value = string.IsNullOrWhiteSpace(model.OldAccountNo) ? "-" : model.OldAccountNo;
 
         index += 1;
         sl.Cell(index, 2).Value = "Address";
@@ -833,6 +833,13 @@ public static class Tools
             {
                 if (string.IsNullOrWhiteSpace(h.AccountNo))
                     continue;
+                // Verified Access accounts already have extra registrar rows (Fidelity, Oando, …).
+                // Keep those account numbers so Admin shows the same units as Access.
+                if (sh.Verified)
+                {
+                    numbers.Add(h.AccountNo.Trim());
+                    continue;
+                }
                 // Signup / Admin "Update Account Number" stamps the profile name exactly.
                 // Register names from a CHN dump are not treated as typed accounts.
                 var typed = string.IsNullOrWhiteSpace(h.AccountName)
@@ -1077,7 +1084,13 @@ public static class Tools
         bool restoreHidden = false, bool attachNew = false)
     {
         sh.LastUpdate = Now;
-        RestrictHoldingsToTypedAccounts(sh);
+        if (!sh.Verified)
+            RestrictHoldingsToTypedAccounts(sh);
+        else if (sh.Holdings != null)
+        {
+            foreach (var h in sh.Holdings.Where(x => x.Status == ShareHoldingStatus.Verified))
+                h.Hidden = false;
+        }
 
         if (!sh.Verified)
         {
@@ -1283,12 +1296,45 @@ public static class Tools
             rows.Add(live);
     }
 
+    /// <summary>
+    /// Units as the Access portal statement shows them: the sum of every unit
+    /// transaction for the account in the register's ___Units view (all T_units rows).
+    /// Returns null when the account has no rows or the register can't be reached.
+    /// </summary>
+    public static async Task<decimal?> StatementUnits(int registerId, string accountNo, FirstReg.Services.DataService data)
+    {
+        if (registerId <= 0 || !int.TryParse((accountNo ?? "").Trim(), out var acc))
+            return null;
+        var estockCs = EstockConnectionString(data);
+        if (string.IsNullOrWhiteSpace(estockCs))
+            return null;
+        try
+        {
+            await using var conn = new SqlConnection(estockCs);
+            await conn.OpenAsync();
+            await using var cmd = new SqlCommand(@"
+SELECT SUM(TotalUnits)
+FROM ___Units WITH (NOLOCK)
+WHERE RegCode = @reg AND AccountNo = @acc", conn)
+            {
+                CommandTimeout = 20
+            };
+            cmd.Parameters.AddWithValue("@acc", acc);
+            cmd.Parameters.AddWithValue("@reg", registerId);
+            var value = await cmd.ExecuteScalarAsync();
+            if (value != null && value != DBNull.Value)
+                return Convert.ToDecimal(value);
+        }
+        catch { }
+        return null;
+    }
+
     static async Task<decimal> LiveRegisterUnits(SqlConnection conn, int accountNo, int registerId)
     {
         try
         {
             await using var cmd = new SqlCommand(@"
-SELECT TOP 1 SumOfno_of_units
+SELECT SUM(SumOfno_of_units)
 FROM getSumOfHoldings
 WHERE account_no = @acc AND reg_code = @reg", conn)
             {

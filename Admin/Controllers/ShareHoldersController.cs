@@ -15,6 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FirstReg.Admin.Controllers
@@ -122,8 +124,56 @@ namespace FirstReg.Admin.Controllers
                 if (sh == null || sh.Hidden)
                     throw new InvalidOperationException("Shareholder was not found, please try again.");
 
-                Tools.RestrictHoldingsToTypedAccounts(sh);
+                // Pending profiles keep only typed registrar + account numbers.
+                // Verified profiles keep every verified holding Access already shows
+                // (e.g. Fidelity 11,000 next to Learn Africa 9,801).
+                if (!sh.Verified)
+                    Tools.RestrictHoldingsToTypedAccounts(sh);
+                else if (sh.Holdings != null)
+                {
+                    foreach (var h in sh.Holdings.Where(x => x.Status == ShareHoldingStatus.Verified))
+                        h.Hidden = false;
+                }
                 await _service.Data.UpdateAsync(sh);
+
+                // Same refresh the Access portal runs on its dashboard, so Admin shows
+                // the same units the shareholder sees.
+                try
+                {
+                    var regids = (await _service.Data.Get<Register>()).Select(x => x.Id).ToList();
+                    sh = await Tools.UpdateAccountDetailsFromStaging(sh, regids, _service.Data);
+
+                    // Use the same unit total the Access portal shows: Access FR Admin sums the
+                    // unit transactions stored in Mongo for the holding; fall back to ___Units.
+                    Bson.Shareholder bsonShareholder = null;
+                    try { bsonShareholder = _mondgodb.Find<Bson.Shareholder, int>(sh.Id, MongoTables.Shareholders).FirstOrDefault(); }
+                    catch (Exception mex) { _logger.LogWarning(mex, "Mongo lookup failed for shareholder {Id}", sh.Id); }
+
+                    foreach (var h in sh.Holdings.Where(x => !x.Hidden && x.Status == ShareHoldingStatus.Verified))
+                    {
+                        var bsonHolding = bsonShareholder?.Holdings?.FirstOrDefault(x =>
+                            x.RegCode == h.RegisterId &&
+                            string.Equals(x.AccountNo?.Trim(), h.AccountNo?.Trim(), StringComparison.OrdinalIgnoreCase));
+                        decimal? mongoUnits = bsonHolding?.Units?.Any() == true ? bsonHolding.Units.Sum(x => x.TotalUnits) : null;
+                        var statementUnits = await Tools.StatementUnits(h.RegisterId, h.AccountNo, _service.Data);
+
+                        _logger.LogInformation("Units for {Reg}/{Acc}: stored={Stored} mongo={Mongo} ___Units={Statement}",
+                            h.RegisterId, h.AccountNo, h.Units, mongoUnits, statementUnits);
+
+                        if (statementUnits.HasValue)
+                            h.Units = statementUnits.Value;
+                        else if (mongoUnits.HasValue)
+                            h.Units = mongoUnits.Value;
+                    }
+
+                    if (sh.Verified) await _service.Data.UpdateAsync(sh);
+                }
+                catch (Exception refreshEx)
+                {
+                    _logger.LogError(refreshEx, "Failed to refresh holdings for {Code}", code);
+                    TempData["error"] = "Some portfolio data could not be refreshed. Showing last known data.";
+                }
+
                 sh = await _service.Data.GetAsQueryable<Shareholder>()
                     .Include(x => x.User)
                     .Include(x => x.Holdings)
@@ -148,6 +198,9 @@ namespace FirstReg.Admin.Controllers
                         HasSignature = d.Signature != null && d.Signature != ""
                     })
                     .FirstOrDefaultAsync() ?? new ShareholderDocFlags();
+
+                ViewBag.CanRecallSubscription = sh.UserId > 0 &&
+                    (await LatestAdminAddedPaymentAsync(sh.UserId.Value)) != null;
 
                 return View(sh);
             }
@@ -396,7 +449,157 @@ namespace FirstReg.Admin.Controllers
                 TempData["error"] = $"Could not add subscription: {Clear.Tools.GetAllExceptionMessage(ex)}";
             }
 
+                return Redirect(Request.Headers[Tools.UrlReferrer].ToString());
+        }
+
+        [HttpPost("add-subscription/{code}")]
+        public async Task<IActionResult> AddSubscription(string code, int years)
+        {
+            try
+            {
+                if (years < 1 || years > 10)
+                    throw new InvalidOperationException("Choose a subscription period between 1 and 10 years.");
+
+                var sh = await _service.Data.GetAsQueryable<Shareholder>()
+                    .Include(x => x.User)
+                    .ThenInclude(x => x.Payments)
+                    .Include(x => x.User)
+                    .ThenInclude(x => x.Subscriptions)
+                    .FirstOrDefaultAsync(x => x.Code.ToLower() == code.ToLower());
+
+                if (sh == null || sh.User == null)
+                    throw new InvalidOperationException("Shareholder was not found, please try again.");
+
+                var now = Tools.Now;
+                var baseDate = sh.ExpiryDate.HasValue && sh.ExpiryDate.Value > now
+                    ? sh.ExpiryDate.Value
+                    : now;
+                sh.StartDate ??= now.Date;
+                sh.ExpiryDate = baseDate.AddYears(years);
+
+                var payment = Payment.CreateForSubscription(new BankPayModel
+                {
+                    Id = Clear.Tools.StringUtility.GetDateCode(),
+                    Amount = 0,
+                    Date = now,
+                    Years = years,
+                    AccountIds = sh.Id.ToString(),
+                    Payee = sh.FullName,
+                    Reference = "ADMIN-ADD",
+                }, sh.User, now);
+
+                payment.Status = PaymentStatus.successful;
+                payment.Updated = now;
+                payment.Remarks = $"Admin added {years} year{(years == 1 ? "" : "s")}";
+
+                sh.User.Payments ??= [];
+                sh.User.Subscriptions ??= [];
+                sh.User.Payments.Add(payment);
+                sh.User.Subscriptions.Add(new Subscription
+                {
+                    Code = payment.Id,
+                    Date = now,
+                    StartDate = (DateTime)sh.StartDate,
+                    EndDate = (DateTime)sh.ExpiryDate,
+                    AmountPaid = 0,
+                    Type = SubscriptionType.IndividualShareholder,
+                    PaymentType = PaymentType.Bank
+                });
+
+                await _service.Data.UpdateAsync(sh);
+
+                TempData["success"] = years == 1
+                    ? "1 year was added to the subscription."
+                    : $"{years} years were added to the subscription.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                TempData["error"] = $"Could not add subscription: {Clear.Tools.GetAllExceptionMessage(ex)}";
+            }
+
             return Redirect(Request.Headers[Tools.UrlReferrer].ToString());
+        }
+
+        [HttpPost("recall-subscription/{code}")]
+        public async Task<IActionResult> RecallSubscription(string code)
+        {
+            try
+            {
+                var sh = await _service.Data.GetAsQueryable<Shareholder>()
+                    .Include(x => x.User)
+                    .FirstOrDefaultAsync(x => x.Code.ToLower() == code.ToLower());
+
+                if (sh == null || sh.User == null)
+                    throw new InvalidOperationException("Shareholder was not found, please try again.");
+
+                var payment = await LatestAdminAddedPaymentAsync(sh.User.Id)
+                    ?? throw new InvalidOperationException("There is no admin subscription addition to recall.");
+
+                var years = AdminAddedYears(payment);
+                if (years < 1)
+                    throw new InvalidOperationException("The last admin addition could not be recalled.");
+
+                if (!sh.ExpiryDate.HasValue)
+                    throw new InvalidOperationException("This shareholder has no subscription expiry to recall.");
+
+                sh.ExpiryDate = sh.ExpiryDate.Value.AddYears(-years);
+
+                var subscription = await _service.Data.Get<Subscription>(x => x.Code == payment.Id);
+                if (subscription != null)
+                    await _service.Data.DeleteAsync(subscription);
+                await _service.Data.DeleteAsync(payment);
+                await _service.Data.UpdateAsync(sh);
+
+                TempData["success"] = years == 1
+                    ? "The last 1 year addition was recalled."
+                    : $"The last {years} years addition was recalled.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                TempData["error"] = $"Could not recall subscription: {Clear.Tools.GetAllExceptionMessage(ex)}";
+            }
+
+            return Redirect(Request.Headers[Tools.UrlReferrer].ToString());
+        }
+
+        private async Task<Payment> LatestAdminAddedPaymentAsync(int userId)
+        {
+            var payments = await _service.Data.Find<Payment>(x =>
+                x.UserId == userId && x.Status == PaymentStatus.successful);
+            return payments
+                .Where(IsAdminAddedSubscription)
+                .OrderByDescending(x => x.Date)
+                .ThenByDescending(x => x.Id)
+                .FirstOrDefault();
+        }
+
+        private static bool IsAdminAddedSubscription(Payment payment)
+        {
+            if (payment == null || string.IsNullOrWhiteSpace(payment.Remarks))
+                return false;
+            if (payment.Remarks.StartsWith("Admin recalled", StringComparison.OrdinalIgnoreCase))
+                return false;
+            return payment.Remarks.StartsWith("Admin added", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static int AdminAddedYears(Payment payment)
+        {
+            try
+            {
+                var model = JsonSerializer.Deserialize<BankPayModel>(payment.Response ?? "",
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (model?.Years is >= 1 and <= 10)
+                    return model.Years;
+            }
+            catch
+            {
+                // Fall through to the remarks text.
+            }
+
+            var match = Regex.Match(payment.Remarks ?? "", @"Admin added (\d+) year", RegexOptions.IgnoreCase);
+            return match.Success && int.TryParse(match.Groups[1].Value, out var years) ? years : 0;
         }
 
         [HttpPost("notify/{code}")]
@@ -536,7 +739,7 @@ namespace FirstReg.Admin.Controllers
                     catch (Exception emailEx)
                     {
                         _logger.LogWarning(emailEx, "Account activated email could not be sent to {Email}", email);
-                        TempData["warning"] = "Account was activated, but the notification email could not be sent.";
+                        TempData["warning"] = $"Account was activated, but the notification email could not be sent: {Clear.Tools.GetAllExceptionMessage(emailEx)}";
                     }
                 }
 

@@ -183,11 +183,37 @@ namespace FirstReg.Admin.Controllers
 
                 await _service.Data.UpdateAsync(payment);
 
+                var emailSent = false;
+                if (payment.User.Type == UserType.Shareholder)
+                {
+                    var email = payment.User.Email;
+                    var name = payment.User.FullName;
+                    if (string.IsNullOrWhiteSpace(name))
+                        name = payment.BankPaymentDetails?.Payee ?? payment.BankPaymentDetails?.User ?? email;
+
+                    if (!string.IsNullOrWhiteSpace(email))
+                    {
+                        try
+                        {
+                            await _service.Email.SendSubscriptionSuccessfulEmailAsync(email, name);
+                            emailSent = true;
+                        }
+                        catch (Exception emailEx)
+                        {
+                            _logger.LogWarning(emailEx, "Subscription email could not be sent to {Email} for payment {PaymentId}", email, payment.Id);
+                        }
+                    }
+                }
+
                 return Ok(new
                 {
                     payment.Id,
                     Status = payment.Status.ToString(),
                     payment.Remarks,
+                    EmailSent = emailSent,
+                    Message = emailSent
+                        ? $"Payment confirmed. Subscription email was sent to {payment.User.Email}."
+                        : "Payment confirmed."
                 });
             }
             catch (Exception ex)

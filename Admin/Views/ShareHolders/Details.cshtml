@@ -196,7 +196,35 @@
                                         <div class="progress h-8px bg-light-primary mb-2">
                                             <div class="progress-bar bg-primary" role="progressbar" style="width: @Model.Percentage%" aria-valuenow="@Model.Percentage" aria-valuemin="0" aria-valuemax="100"></div>
                                         </div>
-                                        <div class="fs-6 text-gray-600 fw-bold mb-10">@Model.DaysLeft days remaining until the next renewal</div>
+                                        <div class="fs-6 text-gray-600 fw-bold mb-6">@Model.DaysLeft days remaining until the next renewal</div>
+                                        <form method="post" asp-action="AddSubscription" asp-route-code="@Model.Code" class="form-loader d-flex flex-wrap align-items-end gap-3">
+                                            <div>
+                                                <label class="fs-6 fw-bold mb-2" for="add_sub_years">Years</label>
+                                                <select id="add_sub_years" name="years" class="form-select form-select-solid w-150px" required>
+                                                    <option value="1">1 year</option>
+                                                    <option value="2">2 years</option>
+                                                    <option value="3">3 years</option>
+                                                    <option value="4">4 years</option>
+                                                    <option value="5">5 years</option>
+                                                    <option value="6">6 years</option>
+                                                    <option value="7">7 years</option>
+                                                    <option value="8">8 years</option>
+                                                    <option value="9">9 years</option>
+                                                    <option value="10">10 years</option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary bt-submit">
+                                                <span class="indicator-label">Add subscription</span>
+                                                <span class="indicator-progress">Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                                            </button>
+                                        </form>
+                                        <form method="post" asp-action="RecallSubscription" asp-route-code="@Model.Code" class="form-loader mt-3">
+                                            <button type="submit" class="btn btn-light-danger bt-submit"
+                                                    onclick="return confirm('Recall the last subscription years you added?');">
+                                                <span class="indicator-label">Recall The Subscription</span>
+                                                <span class="indicator-progress">Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             }
@@ -226,6 +254,12 @@
                                                     <button type="submit" class="btn btn-sm btn-outline btn-outline-danger btn-active-danger m-2">Notify</button>
                                                 </form>
                                                 <button type="button" class="btn btn-sm btn-danger m-2" data-bs-toggle="modal" data-bs-target="#diag_subscribe">Subscribe</button>
+                                                <form method="post" asp-action="RecallSubscription" asp-route-code="@Model.Code" class="form-loader d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-light-danger m-2"
+                                                            onclick="return confirm('Recall the last subscription years you added?');">
+                                                        Recall The Subscription
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>

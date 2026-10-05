@@ -36,12 +36,35 @@ namespace FirstReg.Services
 
     public class EmailService : IEmailSender
     {
+        private static string GetTemplatesPath()
+        {
+            var candidates = new[]
+            {
+                Path.Combine(AppContext.BaseDirectory, "wwwroot", "templates"),
+                Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates"),
+                Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "wwwroot", "templates")),
+                Path.Combine(AppContext.BaseDirectory, "templates"),
+            };
+
+            foreach (var path in candidates)
+            {
+                if (File.Exists(Path.Combine(path, "_layout.html")))
+                    return path;
+            }
+
+            throw new DirectoryNotFoundException(
+                "Email templates folder was not found. Looked in: " + string.Join(" | ", candidates));
+        }
+
         private string GetTemplate(string name)
         {
-            var templatesPath = Path.Combine("wwwroot", "templates");
-            var wrapper = File.ReadAllText(Path.Combine(templatesPath, "_layout.html"));
+            var templatesPath = GetTemplatesPath();
+            var bodyPath = Path.Combine(templatesPath, $"{name}.html");
+            if (!File.Exists(bodyPath))
+                throw new FileNotFoundException($"Email template '{name}.html' was not found in {templatesPath}.");
 
-            wrapper = wrapper.Replace("@RenderBody()", File.ReadAllText(Path.Combine(templatesPath, $"{name}.html")));
+            var wrapper = File.ReadAllText(Path.Combine(templatesPath, "_layout.html"));
+            wrapper = wrapper.Replace("@RenderBody()", File.ReadAllText(bodyPath));
 
             wrapper = wrapper.Replace("[site_url]", "https://firstregistrarsnigeria.com");
             wrapper = wrapper.Replace("[year]", DateTime.Now.Year.ToString());
@@ -53,6 +76,35 @@ namespace FirstReg.Services
             return wrapper;
         }
 
+        private static MailAddress CreateMailAddress(string email, string name = null)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new InvalidOperationException("Email address is missing.");
+
+            email = email.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+                return new MailAddress(email);
+
+            var display = new string(name.Where(c => !char.IsControl(c)).ToArray())
+                .Replace("\"", "'")
+                .Replace("<", "(")
+                .Replace(">", ")")
+                .Replace(",", " ")
+                .Replace(";", " ")
+                .Trim();
+
+            try
+            {
+                return string.IsNullOrWhiteSpace(display)
+                    ? new MailAddress(email)
+                    : new MailAddress(email, display);
+            }
+            catch (FormatException)
+            {
+                return new MailAddress(email);
+            }
+        }
+
         //private string LocalURL(string url) =>
         //    $"{_httpContext.HttpContext.Request.Scheme}://{_httpContext.HttpContext.Request.Host}" +
         //    $"{_httpContext.HttpContext.Request.PathBase}/{url.TrimStart('/')}";
@@ -62,47 +114,47 @@ namespace FirstReg.Services
         //new("friscomms@firstregistrarsnigeria.com", "First Registrars & Investor Services Limited");
 
         public async Task SendValidationEmailAsync(string email, string name, string code) =>
-            await SendEmailAsync(new MailAddress(email, name), "Confirm your Email", "confirm", new { name, code });
+            await SendEmailAsync(CreateMailAddress(email, name), "Confirm your Email", "confirm", new { name, code });
 
         public async Task SendReValidationEmailAsync(string email, string name, string code, string link) =>
-            await SendEmailAsync(new MailAddress(email, name), "Confirm your Email", "reconfirm", new { name, code, link });
+            await SendEmailAsync(CreateMailAddress(email, name), "Confirm your Email", "reconfirm", new { name, code, link });
 
         public async Task<SendResponse> SendWelcomeEmailAsync(string email, string name) =>
-            await SendEmailAsync(new MailAddress(email, name), "Welcome to First Registrars & Investor Services Limited", "welcome", new
+            await SendEmailAsync(CreateMailAddress(email, name), "Welcome to First Registrars & Investor Services Limited", "welcome", new
             {
                 name,
                 link = "https://firstregistrarsnigeria.com/access/login"
             });
 
         public async Task<SendResponse> SendAccountActivatedEmailAsync(string email, string name) =>
-            await SendEmailAsync(new MailAddress(email, name), "Your account has been activated", "activated", new
+            await SendEmailAsync(CreateMailAddress(email, name), "Your account has been activated", "activated", new
             {
                 name,
                 link = "https://access.firstregistrarsnigeria.com/login"
             });
 
         public async Task<SendResponse> SendSubscriptionExpiredEmailAsync(string email, string name) =>
-            await SendEmailAsync(new MailAddress(email, name), "Your subscription has expired", "subscriptionexpired", new
+            await SendEmailAsync(CreateMailAddress(email, name), "Your subscription has expired", "subscriptionexpired", new
             {
                 name,
                 link = "https://access.firstregistrarsnigeria.com/login"
             });
 
         public async Task<SendResponse> SendSubscriptionSuccessfulEmailAsync(string email, string name) =>
-            await SendEmailAsync(new MailAddress(email, name), "Your subscription is successful", "subscriptionsuccessful", new
+            await SendEmailAsync(CreateMailAddress(email, name), "Your subscription is successful", "subscriptionsuccessful", new
             {
                 name,
                 link = "https://access.firstregistrarsnigeria.com/login"
             });
 
         public async Task<SendResponse> SendResetPasswordEmailAsync(string email, string name, string link) =>
-           await SendEmailAsync(new MailAddress(email, name), "Reset Password", "reset", new { name, link });
+           await SendEmailAsync(CreateMailAddress(email, name), "Reset Password", "reset", new { name, link });
 
         public async Task<SendResponse> SendAccountDeletedEmailAsync(string email, string name, string reason) =>
-           await SendEmailAsync(new MailAddress(email, name), "Account Deleted", "accountdeleted", new { name, reason });
+           await SendEmailAsync(CreateMailAddress(email, name), "Account Deleted", "accountdeleted", new { name, reason });
 
         public async Task<SendResponse> SendPasswordEmailAsync(string email, string name, string link) =>
-           await SendEmailAsync(new MailAddress(email, name), "Password Changed", "newpassword", new { name, link });
+           await SendEmailAsync(CreateMailAddress(email, name), "Password Changed", "newpassword", new { name, link });
 
         public async Task<SendResponse> SendSubscrptionEmailAsync(Payment payment) =>
            await SendEmailAsync(payment.User.MailAddress, "You are Subscribed", "subscription", payment);
@@ -188,7 +240,8 @@ namespace FirstReg.Services
             {
                 EnableSsl = true,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential("friscomms@firstregistrarsnigeria.com", "#P1M2B3C?"),
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential("friscomms@firstregistrarsnigeria.com", "#P1M2B3C??"),
                 Port = 587,
             };
 
@@ -303,14 +356,18 @@ namespace FirstReg.Services
             {
                 EnableSsl = true,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential("friscomms@firstregistrarsnigeria.com", "#P1M2B3C?"),
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential("friscomms@firstregistrarsnigeria.com", "#P1M2B3C??"),
                 Port = 587,
             });
 
+            var to = CreateMailAddress(reci.Address, reci.DisplayName);
+            var from = SenderAddress;
+
             var email = Email
-                .From(SenderAddress.Address, SenderAddress.DisplayName)
-                .To(reci.Address, reci.DisplayName)
-                .ReplyTo(reci.Address, reci.DisplayName)
+                .From(from.Address, from.DisplayName)
+                .To(to.Address, to.DisplayName)
+                .ReplyTo(from.Address, from.DisplayName)
                 .Subject(subject)
                 .UsingTemplate(GetTemplate(template), model);
 
@@ -330,7 +387,16 @@ namespace FirstReg.Services
                 }
             }
 
-            return await email.SendAsync();
+            var response = await email.SendAsync();
+            if (!response.Successful)
+            {
+                var errors = response.ErrorMessages != null && response.ErrorMessages.Any()
+                    ? string.Join("; ", response.ErrorMessages)
+                    : "The mail server rejected the message.";
+                throw new InvalidOperationException(errors);
+            }
+
+            return response;
         }
 	}
 }

@@ -14,7 +14,23 @@ namespace FirstReg.Data
         public string Initial => FullName.ToCharArray().First().ToString().ToUpper();
         public string LastName => FullName.Split(' ').Last();
         public string FirstName => FullName.Replace(LastName, "").Trim();
-        public MailAddress MailAddress => new(Email, FullName);
+        public MailAddress MailAddress
+        {
+            get
+            {
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(FullName))
+                        return new MailAddress(Email);
+                    var display = FullName.Replace("\"", "'").Replace(",", " ").Replace(";", " ").Trim();
+                    return new MailAddress(Email, display);
+                }
+                catch
+                {
+                    return new MailAddress(Email);
+                }
+            }
+        }
 
         public string RolesString => string.Join(",", AccessRoles.Select(x => (int)x.Role));
 

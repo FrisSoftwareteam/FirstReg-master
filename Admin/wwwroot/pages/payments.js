@@ -162,7 +162,7 @@ $('#a_confirm').click(function () {
                     c.addClass('d-none');
                     $('#a_cancel').addClass('d-none');
 
-                    toastr.success(`Update was successful for payment #${id}`);
+                    toastr.success(json.message || `Update was successful for payment #${id}`);
                 },
                 error: function (error) {
                     toastr.error(error.responseText);
