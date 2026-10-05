@@ -35,9 +35,9 @@ public class UserModel
             Country = first.Country;
             SecondaryPhone = first.SecondaryPhone;
             PostCode = first.PostCode;
-            Signature = first.Signature;
-            Photo = first.Photo;
-            Passport = first.Passport;
+            _signatureSource = () => first.Signature;
+            _photoSource = () => first.Photo;
+            _passportSource = () => first.Passport;
         }
 
         if (user.StockBroker != null)
@@ -71,9 +71,25 @@ public class UserModel
     public bool EmailConfirmed { get; set; }
     public bool PhoneConfirmed { get; set; }
 
-    public string Signature { get; set; }
-    public string Photo { get; set; }
-    public string Passport { get; set; }
+    // Images load only when a page reads them (they can be several MB each).
+    private System.Func<string> _signatureSource, _photoSource, _passportSource;
+    private string _signature, _photo, _passport;
+    private bool _signatureSet, _photoSet, _passportSet;
+    public string Signature
+    {
+        get { if (!_signatureSet) { _signature = _signatureSource?.Invoke(); _signatureSet = true; } return _signature; }
+        set { _signature = value; _signatureSet = true; }
+    }
+    public string Photo
+    {
+        get { if (!_photoSet) { _photo = _photoSource?.Invoke(); _photoSet = true; } return _photo; }
+        set { _photo = value; _photoSet = true; }
+    }
+    public string Passport
+    {
+        get { if (!_passportSet) { _passport = _passportSource?.Invoke(); _passportSet = true; } return _passport; }
+        set { _passport = value; _passportSet = true; }
+    }
 }
 
 public class ClearingNoModel
@@ -106,9 +122,9 @@ public class ShareholderModel
         MobileNo = shareholder.PrimaryPhone;
         SecondaryPhone = shareholder.SecondaryPhone;
         PostCode = shareholder.PostCode;
-        Signature = shareholder.Signature;
-        Photo = shareholder.Photo;
-        Passport = shareholder.Passport;
+        _signatureSource = () => shareholder.Signature;
+        _photoSource = () => shareholder.Photo;
+        _passportSource = () => shareholder.Passport;
 
         IsGroup = shareholder.User?.AllowGroup ?? false;
 
@@ -130,7 +146,8 @@ public class ShareholderModel
         var hasAccountNo = !string.IsNullOrWhiteSpace(shareholder.AccountNo)
             || (shareholder.Holdings?.Any(h => !string.IsNullOrWhiteSpace(h.AccountNo)) ?? false);
         var hasClearingNo = !string.IsNullOrEmpty(shareholder.ClearingNo);
-        var hasSignature = !string.IsNullOrEmpty(shareholder.Signature);
+        // Verified accounts always had a signature; skip downloading it just to build the activation steps.
+        var hasSignature = shareholder.Verified || !string.IsNullOrEmpty(shareholder.Signature);
 
         ActivationSteps =
         [
@@ -168,9 +185,25 @@ public class ShareholderModel
     public string PostCode { get; set; }
     public bool EmailConfirmed { get; set; }
     public bool PhoneConfirmed { get; set; }
-    public string Signature { get; set; }
-    public string Photo { get; set; }
-    public string Passport { get; set; }
+    // Images load only when a page reads them (they can be several MB each).
+    private System.Func<string> _signatureSource, _photoSource, _passportSource;
+    private string _signature, _photo, _passport;
+    private bool _signatureSet, _photoSet, _passportSet;
+    public string Signature
+    {
+        get { if (!_signatureSet) { _signature = _signatureSource?.Invoke(); _signatureSet = true; } return _signature; }
+        set { _signature = value; _signatureSet = true; }
+    }
+    public string Photo
+    {
+        get { if (!_photoSet) { _photo = _photoSource?.Invoke(); _photoSet = true; } return _photo; }
+        set { _photo = value; _photoSet = true; }
+    }
+    public string Passport
+    {
+        get { if (!_passportSet) { _passport = _passportSource?.Invoke(); _passportSet = true; } return _passport; }
+        set { _passport = value; _passportSet = true; }
+    }
 
     public bool IsGroup { get; set; }
 

@@ -36,9 +36,29 @@ public class CompanySecController : Controller
     {
         try
         {
-            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name);
+            var userName = (User.Identity?.Name ?? string.Empty).Trim().ToLower();
+            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == userName);
+            if (user == null)
+            {
+                _logger.LogWarning("CompanySec: no user found for '{UserName}'", userName);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"No user account was found for '{User.Identity?.Name}'. Please log out and sign in again.");
+            }
+            if (user.Register == null)
+            {
+                _logger.LogWarning("CompanySec: user '{UserName}' has no register linked", userName);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "No register is linked to this account. Please ask an administrator to assign a register to it in the admin app.");
+            }
+
             var regsumm = await _apiClient.GetAsync<Bson.RegSummary>(
                 $"{_apiUrl.GetRegisterSummary}/{user.Register.Id}", "", Common.ApiKeyHeader);
+            if (regsumm == null)
+            {
+                _logger.LogWarning("CompanySec: register summary API returned nothing for register {RegisterId}", user.Register.Id);
+                return StatusCode(StatusCodes.Status502BadGateway,
+                    "The register summary could not be loaded from the eStock API. Please try again shortly.");
+            }
 
             return View(regsumm);
         }
@@ -78,7 +98,7 @@ public class CompanySecController : Controller
     private async Task<List<Bson.RegHolding>> FetchShareholderLists(string s, decimal min,
         decimal max, DateTime? minDate = null, DateTime? maxDate = null, int page = 1, int pagesize = 10000)
     {
-        var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name);
+        var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name.ToLower());
         string url = $"{_apiUrl.GetRegisterShareholder}/{user.Register.Id}?s={s}&min={min}&max={max}&page={page}&size={pagesize}";
 
         if (minDate is not null && maxDate is not null)
@@ -165,7 +185,7 @@ public class CompanySecController : Controller
     {
         try
         {
-            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name);
+            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name.ToLower());
             var sh = await _apiClient.GetAsync<RegSH>(
                 $"{_apiUrl.GetUnits}/{user.Register.Id}/{accno}", "", Common.ApiKeyHeader);
 
@@ -183,7 +203,7 @@ public class CompanySecController : Controller
     {
         try
         {
-            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name);
+            var user = await _service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name.ToLower());
             var sh = await _apiClient.GetAsync<RegSH>(
                 $"{_apiUrl.GetUnits}/{user.Register.Id}/{accno}", "", Common.ApiKeyHeader);
 

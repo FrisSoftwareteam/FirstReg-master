@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +15,8 @@ namespace FirstReg.OnlineAccess.Controllers;
 
 [Authorize]
 [Route("sh")]
-public class ShareholderController(ILogger<ShareholderController> logger, Service service)
+public class ShareholderController(ILogger<ShareholderController> logger, Service service,
+    IApiClient apiClient, EStockApiUrl apiUrl, System.Net.Http.IHttpClientFactory httpClientFactory)
     : BaseController(service, AuditLogSection.Shareholder)
 {
     private readonly PaymentSettings _paystackSetting = Tools.PaymentSettings;
@@ -342,19 +344,9 @@ public class ShareholderController(ILogger<ShareholderController> logger, Servic
     {
         try
         {
-            var user = await service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name.ToLower());
-            var holderIds = user.VisibleShareholders.Select(x => x.Id).ToList();
-
-            var holding = await service.Data.GetAsQueryable<ShareHolding>()
-                .Include(x => x.Shareholder)
-                .Include(x => x.Register)
-                .Where(x => !x.Hidden && x.AccountNo == no && holderIds.Contains(x.ShareHolderId))
-                .OrderByDescending(x => x.Units)
-                .FirstOrDefaultAsync();
-
-            if (holding == null)
-                throw new InvalidOperationException("The selected account was not found, please try again");
-
+            var (holding, statement, statementFailed) = await LoadAccountStatement(no);
+            ViewBag.Statement = statement;
+            ViewBag.StatementFailed = statementFailed;
             return View(new SecurityDetailsModel(holding));
         }
         catch (Exception ex)
@@ -362,6 +354,66 @@ public class ShareholderController(ILogger<ShareholderController> logger, Servic
             TempData["error"] = Clear.Tools.GetAllExceptionMessage(ex);
             return Redirect(GetReferrerUrl());
         }
+    }
+
+    [Route("account-details/{no}/download")]
+    public async Task<IActionResult> DownloadAccountDetails(string no)
+    {
+        try
+        {
+            var (_, statement, _) = await LoadAccountStatement(no);
+            if (statement == null)
+                throw new InvalidOperationException("The statement for this account could not be loaded, please try again");
+
+            var stream = Tools.ExportToXml(statement);
+            var bytes = stream.ToArray();
+            stream.Close();
+            return File(bytes, "application/force-download", $"shareholder-{no}-{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+        }
+        catch (Exception ex)
+        {
+            TempData["error"] = Clear.Tools.GetAllExceptionMessage(ex);
+            return Redirect(GetReferrerUrl());
+        }
+    }
+
+    private async Task<(ShareHolding holding, RegisterHolderModel statement, bool statementFailed)> LoadAccountStatement(string no)
+    {
+        var user = await service.Data.Get<User>(x => x.UserName.ToLower() == User.Identity.Name.ToLower());
+        var holderIds = user.VisibleShareholders.Select(x => x.Id).ToList();
+
+        var holding = await service.Data.GetAsQueryable<ShareHolding>()
+            .Include(x => x.Shareholder)
+            .Include(x => x.Register)
+            .Where(x => !x.Hidden && x.AccountNo == no && holderIds.Contains(x.ShareHolderId))
+            .OrderByDescending(x => x.Units)
+            .FirstOrDefaultAsync();
+
+        if (holding == null)
+            throw new InvalidOperationException("The selected account was not found, please try again");
+
+        RegisterHolderModel statement = null;
+        var statementFailed = false;
+        try
+        {
+            if (int.TryParse(holding.AccountNo?.Trim(), out var accNo))
+            {
+                // Longer timeout than the shared client (see Startup "estock-statement").
+                IApiClient statementClient = new ApiClient(httpClientFactory.CreateClient("estock-statement"));
+                var regSh = await statementClient.GetAsync<RegSH>(
+                    $"{apiUrl.GetUnits}/{holding.RegisterId}/{accNo}", "", Common.ApiKeyHeader);
+                if (regSh != null)
+                    statement = new RegisterHolderModel(regSh);
+            }
+        }
+        catch (Exception apiEx)
+        {
+            statementFailed = true;
+            logger.LogWarning(apiEx, "Could not load statement for register {RegisterId}, account {AccountNo}",
+                holding.RegisterId, holding.AccountNo);
+        }
+
+        return (holding, statement, statementFailed);
     }
 
     [HttpPost("add-account")]

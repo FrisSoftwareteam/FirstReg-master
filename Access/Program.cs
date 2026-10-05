@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace FirstReg.OnlineAccess
 {
@@ -40,12 +41,21 @@ namespace FirstReg.OnlineAccess
                     Console.WriteLine("Config: SetBasePath");
                     config.SetBasePath(Directory.GetCurrentDirectory());
                     Console.WriteLine("Config: appsettings.json");
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    // optional: appsettings*.json are git-ignored (they hold secrets), so CI builds ship without them.
+                    // On Azure every value comes from App settings / Connection strings instead.
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                     Console.WriteLine("Config: env appsettings");
                     config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
                     Console.WriteLine("Config: env vars");
                     config.AddEnvironmentVariables();
                     Console.WriteLine("Config: done");
+                })
+                .ConfigureLogging((context, logging) =>
+                {
+                    // WebHostBuilder (unlike CreateDefaultBuilder) registers no log providers,
+                    // so every ILogger call was silently dropped. Send logs to the console.
+                    logging.AddConfiguration(context.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
                 })
                 .ConfigureServices((context, services) =>
                 {

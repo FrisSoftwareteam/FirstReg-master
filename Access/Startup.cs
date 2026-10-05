@@ -32,7 +32,8 @@ public class Startup
         Console.WriteLine("Startup: registering DbContext");
         services.AddDbContext<AppDB>(options =>
         {
-            options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+                sql => sql.CommandTimeout(120));
         });
 
         Console.WriteLine("Startup: registering MongoClient");
@@ -62,6 +63,10 @@ public class Startup
 
         Console.WriteLine("Startup: registering API helpers");
         services.AddSingleton(_ => new EStockApiUrl(Configuration.GetValue<string>(Common.APISettingName)));
+        // Statement of account: the eStock API runs three queries over the slow database link
+        // (holdings, certificates, dividends), so large accounts need far longer than the 8s
+        // used for the fast pages. Used only by ShareholderController.LoadAccountStatement.
+        services.AddHttpClient("estock-statement", c => c.Timeout = TimeSpan.FromSeconds(90));
         services.AddHttpClient<IApiClient, ApiClient>(c =>
         {
             c.BaseAddress = new Uri(Configuration.GetValue<string>(Common.APISettingName));
