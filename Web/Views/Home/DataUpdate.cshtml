@@ -1,0 +1,635 @@
+@model FirstReg.Web.Models.DataUpdateFormViewModel
+@{
+    ViewData["Title"] = "Data Update Form";
+    var genders = Enum.GetValues(typeof(FirstReg.Data.Gender)).Cast<FirstReg.Data.Gender>();
+    var ageRanges = Enum.GetValues(typeof(FirstReg.Data.AgeRange)).Cast<FirstReg.Data.AgeRange>();
+}
+
+@section styles {
+    <style>
+        .data-update-page {
+            background: #eef1f7;
+            padding: 2rem 0 4rem;
+        }
+
+        .data-update-hero {
+            background: linear-gradient(180deg, #e7ebf4 0%, #eef1f7 100%);
+            border-radius: 28px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .data-update-title {
+            font-size: clamp(2rem, 3vw, 3.2rem);
+            font-weight: 800;
+            color: #172033;
+            letter-spacing: -0.04em;
+            margin-bottom: .5rem;
+        }
+
+        .data-update-subtitle {
+            color: #3c455d;
+            font-size: 1.1rem;
+            max-width: 960px;
+        }
+
+        .data-update-shell {
+            background: #fff;
+            border-radius: 28px;
+            box-shadow: 0 28px 70px rgba(13, 24, 48, 0.08);
+            overflow: hidden;
+        }
+
+        .form-section {
+            padding: 2.5rem 2.5rem 0;
+        }
+
+        .form-section-title {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: #172033;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-rule {
+            height: 1px;
+            background: #e5e9f1;
+            margin-bottom: 2rem;
+        }
+
+        .field-label {
+            font-weight: 700;
+            color: #1d2740;
+            font-size: 1.05rem;
+            margin-bottom: .7rem;
+        }
+
+        .field-label .req {
+            color: #ff4d6d;
+        }
+
+        .form-control-solid,
+        .form-select-solid {
+            height: 4rem;
+            border-radius: 16px;
+            border: 1px solid #dde3ef;
+            background: #f4f7fb;
+            box-shadow: none;
+            padding-left: 1.6rem;
+            padding-right: 1.2rem;
+            font-size: 1rem;
+            color: #172033;
+        }
+
+        .form-control-solid::placeholder {
+            color: #a0a7bb;
+            font-weight: 500;
+        }
+
+        .form-control-solid:focus,
+        .form-select-solid:focus {
+            border-color: #7b4df5;
+            box-shadow: 0 0 0 .2rem rgba(123, 77, 245, .08);
+            background: #fff;
+        }
+
+        .field-stack {
+            margin-bottom: 1.75rem;
+        }
+
+        .btn-cancel-soft {
+            background: #7b4df5;
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            padding: .95rem 2.2rem;
+            font-weight: 700;
+            box-shadow: 0 14px 30px rgba(123, 77, 245, .24);
+        }
+
+        .btn-cancel-soft:hover {
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .btn-add-holding {
+            background: #ebf7ff;
+            color: #0793ff;
+            border: none;
+            border-radius: 16px;
+            padding: .95rem 1.5rem;
+            font-weight: 700;
+        }
+
+        .btn-delete-holding {
+            background: #fff0f5;
+            color: #ff4d6d;
+            border: none;
+            border-radius: 16px;
+            padding: .95rem 1.2rem;
+            font-weight: 700;
+            min-width: 120px;
+        }
+
+        .holding-row {
+            border: 1px solid #e5e9f1;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #fbfcff;
+        }
+
+        .signature-tabs .nav-link {
+            border: none;
+            color: #9ba1b8;
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: .9rem 1.2rem;
+        }
+
+        .signature-tabs .nav-link.active {
+            color: #0793ff;
+            border-bottom: 2px solid #0793ff;
+            background: transparent;
+        }
+
+        .signature-pad {
+            width: 100%;
+            height: 220px;
+            border: 1px solid #dfe5f0;
+            border-radius: 18px;
+            background: #fff;
+            touch-action: none;
+        }
+
+        .section-pad {
+            padding-bottom: 2rem;
+        }
+    </style>
+}
+
+<section class="data-update-page">
+    <div class="container">
+        <div class="data-update-hero">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                    <div class="data-update-title">Data Update Form</div>
+                    <div class="data-update-subtitle">Review the details of your profile, use the form to make changes as need.</div>
+                </div>
+                <a href="/forms" class="btn btn-cancel-soft btn-lg">Cancel</a>
+            </div>
+        </div>
+
+        @if (TempData["success"] != null)
+        {
+            <div class="alert alert-success rounded-4 border-0 shadow-sm">@TempData["success"]</div>
+        }
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger rounded-4 border-0 shadow-sm">
+                <div asp-validation-summary="All"></div>
+            </div>
+        }
+
+        <div class="data-update-shell">
+<form asp-action="DataUpdate" asp-controller="Home" method="post" enctype="multipart/form-data" id="dataUpdateForm">
+                <input type="hidden" name="redirectUrl" value="https://v0-frisformupdate.vercel.app" />
+                @Html.AntiForgeryToken()
+
+                <div class="form-section section-pad">
+                    <div class="form-section-title">Basic Information</div>
+                    <div class="section-rule"></div>
+
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Surname: <span class="req">*</span></label>
+                                <input asp-for="Surname" class="form-control form-control-solid" placeholder="Enter surname" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Other names: <span class="req">*</span></label>
+                                <input asp-for="OtherNames" class="form-control form-control-solid" placeholder="Enter first &amp; middle names" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Gender: <span class="req">*</span></label>
+                                <select asp-for="Gender" class="form-select form-select-solid" required>
+                                    <option value="">Select gender</option>
+                                    @foreach (var gender in genders)
+                                    {
+                                        <option value="@gender">@gender</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Age range: <span class="req">*</span></label>
+                                <select asp-for="AgeRange" class="form-select form-select-solid" required>
+                                    <option value="">Select age range</option>
+                                    @foreach (var range in ageRanges)
+                                    {
+                                        <option value="@range">@range</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section section-pad">
+                    <div class="form-section-title">New Address</div>
+                    <div class="section-rule"></div>
+
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="field-stack">
+                                <label class="field-label">Address: <span class="req">*</span></label>
+                                <input asp-for="Address" class="form-control form-control-solid" placeholder="12 Clearwox Drive" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="field-stack">
+                                <label class="field-label">City: <span class="req">*</span></label>
+                                <input asp-for="City" class="form-control form-control-solid" placeholder="e.g. Ikeja" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="field-stack">
+                                <label class="field-label">State: <span class="req">*</span></label>
+                                <input asp-for="State" class="form-control form-control-solid" placeholder="e.g. Lagos" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="field-stack">
+                                <label class="field-label">Country: <span class="req">*</span></label>
+                                <input asp-for="Country" class="form-control form-control-solid" placeholder="e.g. Nigeria" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section section-pad">
+                    <div class="form-section-title">Any Previous Address?</div>
+                    <div class="section-rule"></div>
+
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="field-stack">
+                                <label class="field-label">Address:</label>
+                                <input asp-for="PreviousAddress" class="form-control form-control-solid" placeholder="12 Clearwox Drive" />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="field-stack">
+                                <label class="field-label">City:</label>
+                                <input asp-for="PreviousCity" class="form-control form-control-solid" placeholder="e.g. Ikeja" />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="field-stack">
+                                <label class="field-label">State:</label>
+                                <input asp-for="PreviousState" class="form-control form-control-solid" placeholder="e.g. Lagos" />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="field-stack">
+                                <label class="field-label">Country:</label>
+                                <input asp-for="PreviousCountry" class="form-control form-control-solid" placeholder="e.g. Nigeria" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section section-pad">
+                    <div class="form-section-title">Contact Information</div>
+                    <div class="section-rule"></div>
+
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Primary Number: <span class="req">*</span></label>
+                                <input asp-for="PrimaryNumber" class="form-control form-control-solid" placeholder="e.g. 08012341234" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Secondary Number:</label>
+                                <input asp-for="SecondaryNumber" class="form-control form-control-solid" placeholder="e.g. 08012341234" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="field-stack">
+                                <label class="field-label">Email address: <span class="req">*</span></label>
+                                <input asp-for="EmailAddress" type="email" class="form-control form-control-solid" placeholder="e.g. user@email.com" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section section-pad">
+                    <div class="form-section-title">Other Information</div>
+                    <div class="section-rule"></div>
+
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Clearing No:</label>
+                                <input asp-for="ClearingNo" class="form-control form-control-solid" placeholder="e.g. CH87654321" />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">National Identification Number (NIN):</label>
+                                <input asp-for="NIN" class="form-control form-control-solid" placeholder="e.g. 00000000" />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Tax Identification Number (TIN):</label>
+                                <input asp-for="TIN" class="form-control form-control-solid" placeholder="e.g. 0000000" />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Nationality: <span class="req">*</span></label>
+                                <input asp-for="Nationality" class="form-control form-control-solid" placeholder="e.g. Nigerian" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">State of Origin: <span class="req">*</span></label>
+                                <input asp-for="StateOfOrigin" class="form-control form-control-solid" placeholder="e.g. Oyo" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Date of Birth: <span class="req">*</span></label>
+                                <input asp-for="DateOfBirth" class="form-control form-control-solid" placeholder="e.g. DD/MMM/YYYY" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section section-pad">
+                    <div class="form-section-title">Next of kin</div>
+                    <div class="section-rule"></div>
+
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Full Name: <span class="req">*</span></label>
+                                <input asp-for="NextOfKinFullName" class="form-control form-control-solid" placeholder="e.g. John Bull" required />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="field-stack">
+                                <label class="field-label">Phone Number: <span class="req">*</span></label>
+                                <input asp-for="NextOfKinPhone" class="form-control form-control-solid" placeholder="e.g. 08012341234" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section section-pad">
+                    <div class="form-section-title">Certificates</div>
+                    <div class="section-rule"></div>
+
+                    <div id="holdingsContainer">
+                        @for (var i = 0; i < Model.Holdings.Count; i++)
+                        {
+                            <div class="row g-3 align-items-end holding-row holding-item" data-index="@i">
+                                <div class="col-lg-7">
+                                    <div class="field-stack mb-0">
+                                        <label class="field-label">Security: <span class="req">*</span></label>
+                                        <select name="Holdings[@i].RegId" class="form-select form-select-solid" required>
+                                            <option value="0">Select security</option>
+                                @foreach (var reg in Model.Registers)
+                                            {
+                                                var selected = Model.Holdings[i].RegId == reg.Id ? "selected=\"selected\"" : string.Empty;
+                                                <option value="@reg.Id">@reg.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="field-stack mb-0">
+                                        <label class="field-label">Account No: <span class="req">*</span></label>
+                                        <input name="Holdings[@i].AccountNo" value="@Model.Holdings[i].AccountNo" class="form-control form-control-solid" placeholder="Enter account no" required />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <button type="button" class="btn btn-delete-holding w-100 remove-holding">Delete</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <button type="button" class="btn btn-add-holding mt-3" id="addHoldingBtn">Add more</button>
+                </div>
+
+                <div class="form-section section-pad">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="form-section-title mb-0">Signature</div>
+                    </div>
+                    <div class="section-rule"></div>
+
+                    <ul class="nav nav-tabs signature-tabs justify-content-end mb-4" id="signatureTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-pane" type="button" role="tab">Upload</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="draw-tab" data-bs-toggle="tab" data-bs-target="#draw-pane" type="button" role="tab">Draw</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="upload-pane" role="tabpanel">
+                            <div class="row g-4 justify-content-center">
+                                <div class="col-lg-8">
+                                    <label class="field-label">Select File</label>
+                                    <input asp-for="SignatureFile" type="file" class="form-control form-control-solid" accept="image/*,.png,.jpg,.jpeg,.pdf" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="draw-pane" role="tabpanel">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <div class="field-stack">
+                                        <label class="field-label">Draw your signature</label>
+                                        <canvas id="signatureCanvas" class="signature-pad"></canvas>
+                                        <input asp-for="SignatureDataUrl" type="hidden" id="SignatureDataUrl" />
+                                        <input asp-for="SignatureMode" type="hidden" id="SignatureMode" />
+                                    </div>
+                                    <button type="button" class="btn btn-add-holding" id="clearSignatureBtn">Clear drawing</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section section-pad">
+                    <div class="section-rule"></div>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">Submit</button>
+                        <a href="/forms" class="btn btn-secondary btn-lg px-5">Cancel</a>
+                    </div>
+                </div>
+            </form>
+
+            <template id="holdingTemplate">
+                <div class="row g-3 align-items-end holding-row holding-item" data-index="__index__">
+                    <div class="col-lg-7">
+                        <div class="field-stack mb-0">
+                            <label class="field-label">Security: <span class="req">*</span></label>
+                            <select name="Holdings[__index__].RegId" class="form-select form-select-solid" required>
+                                <option value="0">Select security</option>
+                                @foreach (var reg in Model.Registers)
+                                {
+                                    <option value="@reg.Id">@reg.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="field-stack mb-0">
+                            <label class="field-label">Account No: <span class="req">*</span></label>
+                            <input name="Holdings[__index__].AccountNo" class="form-control form-control-solid" placeholder="Enter account no" required />
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <button type="button" class="btn btn-delete-holding w-100 remove-holding">Delete</button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script>
+        (function () {
+            const container = document.getElementById('holdingsContainer');
+            const addBtn = document.getElementById('addHoldingBtn');
+            const template = document.getElementById('holdingTemplate');
+            const form = document.getElementById('dataUpdateForm');
+            const uploadTab = document.getElementById('upload-tab');
+            const drawTab = document.getElementById('draw-tab');
+            const uploadPane = document.getElementById('upload-pane');
+            const drawPane = document.getElementById('draw-pane');
+            const modeInput = document.getElementById('SignatureMode');
+            const signatureDataUrl = document.getElementById('SignatureDataUrl');
+            const canvas = document.getElementById('signatureCanvas');
+            const clearBtn = document.getElementById('clearSignatureBtn');
+            const ctx = canvas ? canvas.getContext('2d') : null;
+
+            const resizeCanvas = () => {
+                if (!canvas || !ctx) return;
+                const ratio = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = Math.max(1, rect.width * ratio);
+                canvas.height = Math.max(1, rect.height * ratio);
+                ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = '#172033';
+            };
+
+            const clearCanvas = () => {
+                if (!canvas || !ctx) return;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                resizeCanvas();
+            };
+
+            let drawing = false;
+            const draw = (event) => {
+                if (!drawing || !canvas || !ctx) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (event.clientX || event.touches?.[0]?.clientX) - rect.left;
+                const y = (event.clientY || event.touches?.[0]?.clientY) - rect.top;
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            };
+
+            if (canvas && ctx) {
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+
+                canvas.addEventListener('pointerdown', function (e) {
+                    drawing = true;
+                    ctx.beginPath();
+                    const rect = canvas.getBoundingClientRect();
+                    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+                    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+                    ctx.moveTo(x, y);
+                    e.preventDefault();
+                });
+
+                canvas.addEventListener('pointermove', function (e) {
+                    draw(e);
+                    e.preventDefault();
+                });
+                window.addEventListener('pointerup', function () {
+                    drawing = false;
+                });
+            }
+
+            if (clearBtn && canvas) {
+                clearBtn.addEventListener('click', function () {
+                    clearCanvas();
+                    if (signatureDataUrl) {
+                        signatureDataUrl.value = '';
+                    }
+                });
+            }
+
+            if (drawTab) {
+                drawTab.addEventListener('shown.bs.tab', function () {
+                    if (modeInput) modeInput.value = 'draw';
+                    if (canvas) {
+                        resizeCanvas();
+                    }
+                });
+            }
+
+            if (uploadTab) {
+                uploadTab.addEventListener('shown.bs.tab', function () {
+                    if (modeInput) modeInput.value = 'upload';
+                });
+            }
+
+            if (addBtn && template) {
+                addBtn.addEventListener('click', function () {
+                    const index = container.querySelectorAll('.holding-item').length;
+                    const node = document.createElement('div');
+                    node.innerHTML = template.innerHTML.replaceAll('__index__', index);
+                    container.appendChild(node.firstElementChild);
+                });
+            }
+
+            container.addEventListener('click', function (e) {
+                if (!e.target.classList.contains('remove-holding')) return;
+                const rows = container.querySelectorAll('.holding-item');
+                if (rows.length === 1) return;
+                e.target.closest('.holding-item').remove();
+            });
+
+            form.addEventListener('submit', function () {
+                if (drawTab && drawTab.classList.contains('active') && canvas && signatureDataUrl) {
+                    signatureDataUrl.value = canvas.toDataURL('image/png');
+                }
+                if (modeInput && drawTab && drawTab.classList.contains('active')) {
+                    modeInput.value = 'draw';
+                } else if (modeInput) {
+                    modeInput.value = 'upload';
+                }
+            });
+        })();
+    </script>
+}

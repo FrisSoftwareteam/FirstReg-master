@@ -27,3 +27,16 @@ subform.submit(function (e) {
         }
     });
 });
+
+$(function () {
+    var $onlineAccess = $('.main-header .action-btns a.btn-primary[href*="access.firstregistrarsnigeria.com"]').first();
+    if ($onlineAccess.length && $('.main-header .action-btns a[href*="v0-frisformupdate.vercel.app"]').length === 0 && $('.main-header .action-btns a[href="/forms"]').length === 0) {
+        $('<a/>', {
+            href: 'https://v0-frisformupdate.vercel.app',
+            text: 'Forms',
+            class: 'btn btn-primary me-2',
+            target: '_blank',
+            rel: 'noopener'
+        }).insertBefore($onlineAccess);
+    }
+});
