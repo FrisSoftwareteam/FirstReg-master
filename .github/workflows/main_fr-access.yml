@@ -10,6 +10,9 @@ jobs:
   build-and-deploy:
     if: github.repository != 'FrisSoftwareteam/Admin1' && github.repository != 'FrisSoftwareteam/Admin'
     runs-on: windows-latest
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Checkout
@@ -23,9 +26,16 @@ jobs:
       - name: Publish Access app
         run: dotnet publish Access/FirstReg.OnlineAccess.csproj -c Release -o publish
 
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B234BACDCB594A54A29AF901427DFA58 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3363559A40BB49CCA561AF45A8FE667E }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5BB033CD81DF489DAAE80A8E2DC5F22D }}
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: "fr-access"
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          slot-name: "Production"
           package: publish
