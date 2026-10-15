@@ -69,19 +69,19 @@
         <div class="carousel-item active">
             <!-- Ifeanyi Ayodeji Ukomadu worked on this -->
             <section class="hero-section h-slide ptb-120 d-flex align-items-center bg-dark text-white position-relative overflow-hidden"
-                     style="background: url('/img/lead-banner.png') no-repeat top right; background-size: cover;">
-                <div class="container ptb-60">
+                     style="background: url('/img/lead-banner.png') no-repeat center right; background-size: cover;">
+                <div class="container">
                     <div class="row justify-content-between align-items-center">
-                        <div class="px-5 col-12 col-sm-10 col-lg-6">
+                        <div class="col-12 col-lg-7">
                             <div class="hero-content-wrap">
                                 <h5 class="text-warning">The Leading Registrar</h5>
-                                <h2 class="fw-bold">The Best Share Registration & Data Management Service</h2>
+                                <h2 class="fw-bold">The Best Share Registration &amp; Data Management Service</h2>
                                 <p class="lead">
                                     We create excellent customer experience through innovation and superior service delivery that connects people to their wealth.
                                 </p>
-                                <div class="action-btns mt-5">
-                                    <a href="/about" class="btn btn-info me-3">About Us</a>
-                                    @* <a href="/service" class="btn btn-outline-light">Our Services</a> *@
+                                <div class="action-btns hero-actions">
+                                    <a href="/about" class="btn btn-warning">About Us</a>
+                                    <a href="/services/register-management" class="btn btn-outline-light">Our Services</a>
                                 </div>
                             </div>
                         </div>
@@ -93,20 +93,20 @@
         <!-- Slide 3 -->
         <div class="carousel-item">
             <section class="hero-section h-slide ptb-120 d-flex align-items-center bg-dark text-white position-relative overflow-hidden"
-                     style="background: url('/img/slide-1.jpg') no-repeat top center; background-size: cover;">
-                <div class="container ptb-60">
+                     style="background: url('/img/slide-1.jpg') no-repeat center center; background-size: cover;">
+                <div class="container">
                     <div class="row justify-content-between align-items-center">
-                        <div class="px-5 col-12 col-sm-10 col-lg-6">
+                        <div class="col-12 col-lg-7">
                             <div class="hero-content-wrap">
                                 <h5 class="text-warning">Online Access</h5>
                                 <h2 class="fw-bold">Take control of your share accounts with just a click.</h2>
                                 <p class="lead">
                                     An internet window that allows shareholders online access to their share accounts with First Registrars.
                                 </p>
-                                <div class="action-btns mt-5">
-                                    <a href="/access" target="_blank" class="btn btn-primary me-3 mb-0">Login Now</a>
+                                <div class="action-btns hero-actions">
+                                    <a href="/access" target="_blank" class="btn btn-warning">Login Now</a>
                                     <a href="/e-products/online-access" class="btn btn-outline-light">Learn More</a>
-                                    <a href="/forms/data-update" class="btn btn-outline-warning ms-3">Complete Form</a>
+                                    <a href="/forms/data-update" class="btn btn-outline-light">Complete Form</a>
                                 </div>
                             </div>
                         </div>
@@ -118,18 +118,18 @@
         <!-- Slide 4 -->
         <div class="carousel-item">
             <section class="hero-section h-slide ptb-120 d-flex align-items-center bg-dark text-white position-relative overflow-hidden"
-                     style="background: url('/img/slide-3.jpg') no-repeat top right; background-size: cover;">
-                <div class="container ptb-60">
+                     style="background: url('/img/slide-3.jpg') no-repeat center right; background-size: cover;">
+                <div class="container">
                     <div class="row justify-content-between align-items-center">
-                        <div class="px-5 col-12 col-sm-10 col-lg-6">
+                        <div class="col-12 col-lg-7">
                             <div class="hero-content-wrap">
                                 <h5 class="text-warning">e-Share Notifier</h5>
                                 <h2 class="fw-bold">Never miss vital information about your investment</h2>
                                 <p class="lead">
                                     Receive SMS alerts right on your mobile phones on information, transactions and updates.
                                 </p>
-                                <div class="action-btns mt-5">
-                                    <a href="/e-products/e-share-notifier" class="btn btn-outline-light">Learn More</a>
+                                <div class="action-btns hero-actions">
+                                    <a href="/e-products/e-share-notifier" class="btn btn-warning">Learn More</a>
                                 </div>
                             </div>
                         </div>
@@ -148,6 +148,8 @@
         <span class="visually-hidden">Next</span>
     </button>
 </div>
+
+<partial name="_BluNestInvest" />
 
 <partial name="_PzScripDividend" />
 
@@ -168,22 +170,22 @@
             <!-- Registrar Services -->
             <div class="col-lg-3 col-md-6">
                 <div class="promo-single position-relative text-center bg-white custom-shadow rounded-custom p-5 mb-4 d-flex flex-column h-100">
-                    <div class="promo-icon mb-32">
-                        <i class="fas fa-wifi text-primary fa-3x"></i>
+                    <div class="promo-icon">
+                        <i class="fas fa-folder-open"></i>
                     </div>
                     <div class="promo-info">
                         <h3 class="h5">Registrar Services</h3>
                         <p class="mb-0">Management of Client Companies Register of Shareholders, Payment of Dividends, Share Transfers...</p>
                     </div>
-                    <a href="/services/register-management" class="btn btn-primary d-block mt-5">Learn More</a>
+                    <a href="/services/register-management" class="btn btn-outline-primary">Learn More</a>
                 </div>
             </div>
 
             <!-- KYC Services -->
             <div class="col-lg-3 col-md-6">
                 <div class="promo-single position-relative text-center bg-white custom-shadow rounded-custom p-5 mb-4 d-flex flex-column h-100">
-                    <div class="promo-icon mb-32">
-                        <i class="fas fa-user-friends text-success fa-3x"></i>
+                    <div class="promo-icon">
+                        <i class="fas fa-id-card"></i>
                     </div>
                     <div class="promo-info">
                         <h3 class="h5">KYC/Address Verification</h3>
@@ -191,42 +193,40 @@
                             We undertake the process of Address, Documents and Identity Verification on behalf of all our clients.
                         </p>
                     </div>
-                    <a href="https://check.cle.ng/index.html" class="btn btn-primary d-block mt-5" target="_blank" rel="noopener">Learn More</a>
+                    <a href="https://check.cle.ng/index.html" class="btn btn-outline-primary" target="_blank" rel="noopener">Learn More</a>
                 </div>
             </div>
 
             <!-- Company Secretarial and Probate Administration -->
             <div class="col-lg-3 col-md-6">
                 <div class="promo-single position-relative text-center bg-white custom-shadow rounded-custom p-5 mb-4 d-flex flex-column h-100">
-                    <div class="promo-icon mb-32">
-                        <i class="fas fa-bezier-curve text-danger fa-3x"></i>
+                    <div class="promo-icon">
+                        <i class="fas fa-balance-scale"></i>
                     </div>
                     <div class="promo-info">
                         <h3 class="h5">Company Secretarial and Probate Administration</h3>
                         <p class="mb-0">Company Secretarial and Probate services ensuring compliance.</p>
                     </div>
-                    <a href="/services/probate" class="btn btn-primary d-block mt-5">Learn More</a>
+                    <a href="/services/probate" class="btn btn-outline-primary">Learn More</a>
                 </div>
             </div>
 
             <!-- CLE Digital Service -->
             <div class="col-lg-3 col-md-6">
                 <div class="promo-single position-relative text-center bg-white custom-shadow rounded-custom p-5 mb-4 d-flex flex-column h-100">
-                    <div class="promo-icon mb-32">
-                        <i class="fas fa-globe-africa text-info fa-3x"></i>
+                    <div class="promo-icon">
+                        <i class="fas fa-laptop"></i>
                     </div>
                     <div class="promo-info">
                         <h3 class="h5">Cle Digital Solutions Provider</h3>
                         <p class="mb-0">We transform businesses with cutting-edge solutions that streamline operations and drive growth.</p>
                     </div>
-                    <a href="https://cle.ng/" class="btn btn-primary d-block mt-5" target="_blank" rel="noopener">Learn More</a>
+                    <a href="https://cle.ng/" class="btn btn-outline-primary" target="_blank" rel="noopener">Learn More</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<partial name="_DeapAgm244" />
 
 <!-- ======= Clients Section ======= -->
 <section class="cutomer-review-app-two ptb-60">
@@ -358,42 +358,6 @@
 <!-- ======= Scrolling Registration Notice ======= -->
 <div class="disclaimer-ticker">
     <p>
-        FIRST REGISTRARS & INVESTOR SERVICES LIMITED IS DULY REGISTERED AND REGULATED BY THE SECURITIES & EXCHANGE COMMISSION, NIGERIA.
+        FIRST REGISTRARS &amp; INVESTOR SERVICES LIMITED IS DULY REGISTERED AND REGULATED BY THE SECURITIES &amp; EXCHANGE COMMISSION, NIGERIA.
     </p>
 </div>
-
-<style>
-    .disclaimer-ticker {
-        width: 100%;
-        overflow: hidden;
-        background: #002244; /* Deep corporate blue */
-        padding: 12px 0;
-        border-top: 3px solid #ffc107; /* Gold accent */
-        position: relative;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .disclaimer-ticker p {
-        display: inline-block;
-        white-space: nowrap;
-        font-size: 15px;
-        color: #fff;
-        font-weight: 500;
-        letter-spacing: 1px;
-        animation: scrollText 25s linear infinite;
-        margin: 0;
-    }
-
-    @@keyframes scrollText {
-        0% {
-            transform: translateX(100%);
-        }
-        100% {
-            transform: translateX(-100%);
-        }
-    }
-
-    .disclaimer-ticker:hover p {
-        animation-play-state: paused;
-    }
-</style>
