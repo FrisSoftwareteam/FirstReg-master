@@ -26,7 +26,7 @@ namespace FirstReg.Web
             new TeamMember { Name = "Amidu Akinyemi", Designation = "Chief Financial Officer (CFO)", Photo = "amidu-akinyemi-2026.jpg" },
             new TeamMember { Name = "Oluwaseyi Obabunmi Adetola, Esq.", Designation = "Divisional Head, Legal & Regulatory Compliance", Photo = "oluwaseyi-adetola-2026.jpg" },
             new TeamMember { Name = "Olubunmi Oguntoye", Designation = "Divisional Head, Registrar Services", Photo = "olubunmi-oguntoye-2026.jpg" },
-            new TeamMember { Name = "Olukorede Titilolu", Designation = "Divisional Head, Corporate Services", Photo = "olukorede-titilolu.jpg" },
+            new TeamMember { Name = "Olukorede Titilolu", Designation = "Divisional Head, Corporate Services", Photo = "olukorede-titilolu-2026.jpg" },
             new TeamMember { Name = "Omowunmi Senkoya", Designation = "Head, Abuja Branch", Photo = "omowunmi-senkoya.jpg" }
         };
 
