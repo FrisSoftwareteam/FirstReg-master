@@ -74,7 +74,7 @@ namespace FirstReg.Web.Controllers
         {
             try
             {
-                var path = Path.Combine(Directory.GetCurrentDirectory(), _jsonPath, $"{id}.json");
+                var path = Path.Combine(Directory.GetCurrentDirectory(), _jsonPath, $"{p.Profile ?? id}.json");
                 p.Html = Clear.Tools.StringUtility.ParseEditorJS(JsonSerializer.Deserialize<Clear.EditorJS.Content>(Clear.Tools.FileManager.ReadFile(path)));
                 return View(p);
             }

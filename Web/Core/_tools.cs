@@ -13,7 +13,7 @@ namespace FirstReg.Web
         private static readonly List<TeamMember> Directors = new()
         {
             new TeamMember { Name = "Sikiru Rufai", Designation = "Chairman", Photo = "sikiru-rufai.jpg" },
-            new TeamMember { Name = "Mr. Ezekiel Oni, FCA", Designation = "Managing Director / Chief Executive Officer", Photo = "ezekiel-oni-md-v2.jpg" },
+            new TeamMember { Name = "Mr. Ezekiel Oni, FCA", Designation = "Managing Director / Chief Executive Officer", Photo = "ezekiel-oni-md-v2.jpg", Profile = "mr-ezekiel-oni-fca" },
             new TeamMember { Name = "Mohammed Balarabe", Designation = "Non Executive Director", Photo = "mohammed-balarabe.jpg" },
             new TeamMember { Name = "Mrs. Foluke Oyeleye", Designation = "Non Executive Director", Photo = "foluke-yeleye.jpg" },
             new TeamMember { Name = "Obafolajimi Otudeko", Designation = "Non Executive Director", Photo = "obafolajimi-otudeko.jpg" }
@@ -21,7 +21,7 @@ namespace FirstReg.Web
 
         private static readonly List<TeamMember> Management = new()
         {
-            new TeamMember { Name = "Mr. Ezekiel Oni, FCA", Designation = "Managing Director / Chief Executive Officer", Photo = "ezekiel-oni-md-v2.jpg" },
+            new TeamMember { Name = "Mr. Ezekiel Oni, FCA", Designation = "Managing Director / Chief Executive Officer", Photo = "ezekiel-oni-md-v2.jpg", Profile = "mr-ezekiel-oni-fca" },
             new TeamMember { Name = "Yaya Lawal", Designation = "Divisional Head, Marketing & Business Development", Photo = "yaya-lawal-2026.jpg" },
             new TeamMember { Name = "Amidu Akinyemi", Designation = "Chief Financial Officer (CFO)", Photo = "amidu-akinyemi-2026.jpg" },
             new TeamMember { Name = "Oluwaseyi Obabunmi Adetola, Esq.", Designation = "Divisional Head, Legal & Regulatory Compliance", Photo = "oluwaseyi-adetola-2026.jpg" },
@@ -83,6 +83,7 @@ namespace FirstReg.Web
         public string Designation { get; set; }
         public string Photo { get; set; }
         public string Id => Clear.Tools.StringUtility.GenerateUrlKey(Name);
+        public string Profile { get; set; }
 
         public string Html { get; set; }
     }
