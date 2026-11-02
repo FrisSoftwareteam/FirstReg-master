@@ -16,7 +16,7 @@ namespace FirstReg.Web
             new TeamMember { Name = "Mr. Ezekiel Oni, FCA", Designation = "Managing Director / Chief Executive Officer", Photo = "ezekiel-oni-md-v2.jpg", Profile = "mr-ezekiel-oni-fca" },
             new TeamMember { Name = "Mohammed Balarabe", Designation = "Non Executive Director", Photo = "mohammed-balarabe-2026.jpg" },
             new TeamMember { Name = "Mrs. Foluke Oyeleye", Designation = "Non Executive Director", Photo = "foluke-oyeleye-2026.jpg", Profile = "mrs-foluke-oyeleye" },
-            new TeamMember { Name = "Obafolajimi Otudeko", Designation = "Non Executive Director", Photo = "obafolajimi-otudeko.jpg" }
+            new TeamMember { Name = "Obafolajimi Otudeko", Designation = "Non Executive Director", Photo = "obafolajimi-otudeko-2026.jpg" }
         };
 
         private static readonly List<TeamMember> Management = new()
