@@ -22,7 +22,7 @@ namespace FirstReg.Web
         private static readonly List<TeamMember> Management = new()
         {
             new TeamMember { Name = "Mr. Ezekiel Oni, FCA", Designation = "Managing Director / Chief Executive Officer", Photo = "ezekiel-oni-md.jpg" },
-            new TeamMember { Name = "Yaya Lawal", Designation = "Divisional Head, Marketing & Business Development", Photo = "yaya-lawal.jpg" },
+            new TeamMember { Name = "Yaya Lawal", Designation = "Divisional Head, Marketing & Business Development", Photo = "yaya-lawal-2026.jpg" },
             new TeamMember { Name = "Amidu Akinyemi", Designation = "Chief Financial Officer (CFO)", Photo = "amidu-akinyemi.jpg" },
             new TeamMember { Name = "Oluwaseyi Obabunmi Adetola, Esq.", Designation = "Divisional Head, Legal & Regulatory Compliance", Photo = "Oluwaseyi-adetola.jpg" },
             new TeamMember { Name = "Olubunmi Oguntoye", Designation = "Divisional Head, Registrar Services", Photo = "olubunmi-oguntoye.jpg" },
