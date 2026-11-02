@@ -13,7 +13,7 @@ namespace FirstReg.Web
         private static readonly List<TeamMember> Directors = new()
         {
             new TeamMember { Name = "Sikiru Rufai", Designation = "Chairman", Photo = "sikiru-rufai.jpg" },
-            new TeamMember { Name = "Bayo Olugbemi", Designation = "Managing Director / Chief Executive Officer", Photo = "bayo-olugbemi.jpg" },
+            new TeamMember { Name = "Mr. Ezekiel Oni, FCA", Designation = "Managing Director / Chief Executive Officer", Photo = "ezekiel-oni-md.jpg" },
             new TeamMember { Name = "Mohammed Balarabe", Designation = "Non Executive Director", Photo = "mohammed-balarabe.jpg" },
             new TeamMember { Name = "Mrs. Foluke Oyeleye", Designation = "Non Executive Director", Photo = "foluke-yeleye.jpg" },
             new TeamMember { Name = "Obafolajimi Otudeko", Designation = "Non Executive Director", Photo = "obafolajimi-otudeko.jpg" }
@@ -21,8 +21,7 @@ namespace FirstReg.Web
 
         private static readonly List<TeamMember> Management = new()
         {
-            new TeamMember { Name = "Bayo Olugbemi", Designation = "Managing Director / Chief Executive Officer", Photo = "bayo-olugbemi.jpg" },
-            new TeamMember { Name = "Ezekiel Oni", Designation = "Chief Operating Officer (COO)", Photo = "ezekiel-oni.jpg" },
+            new TeamMember { Name = "Mr. Ezekiel Oni, FCA", Designation = "Managing Director / Chief Executive Officer", Photo = "ezekiel-oni-md.jpg" },
             new TeamMember { Name = "Yaya Lawal", Designation = "Divisional Head, Marketing & Business Development", Photo = "yaya-lawal.jpg" },
             new TeamMember { Name = "Amidu Akinyemi", Designation = "Chief Financial Officer (CFO)", Photo = "amidu-akinyemi.jpg" },
             new TeamMember { Name = "Oluwaseyi Obabunmi Adetola, Esq.", Designation = "Divisional Head, Legal & Regulatory Compliance", Photo = "Oluwaseyi-adetola.jpg" },
