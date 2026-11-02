@@ -12,7 +12,7 @@ namespace FirstReg.Web
         // cached reference data to avoid reallocation on each call
         private static readonly List<TeamMember> Directors = new()
         {
-            new TeamMember { Name = "Sikiru Rufai", Designation = "Chairman", Photo = "sikiru-rufai.jpg" },
+            new TeamMember { Name = "Sikiru Rufai", Designation = "Chairman", Photo = "sikiru-rufai-2026.jpg" },
             new TeamMember { Name = "Mr. Ezekiel Oni, FCA", Designation = "Managing Director / Chief Executive Officer", Photo = "ezekiel-oni-md-v2.jpg", Profile = "mr-ezekiel-oni-fca" },
             new TeamMember { Name = "Mohammed Balarabe", Designation = "Non Executive Director", Photo = "mohammed-balarabe.jpg" },
             new TeamMember { Name = "Mrs. Foluke Oyeleye", Designation = "Non Executive Director", Photo = "foluke-yeleye.jpg", Profile = "mrs-foluke-oyeleye" },
