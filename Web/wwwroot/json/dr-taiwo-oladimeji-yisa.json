@@ -1,0 +1,36 @@
+{
+    "time": 1793792740338,
+    "blocks": [
+        {
+            "type": "paragraph",
+            "data": {
+                "text": "<b>Dr. Taiwo Oladimeji-Yisa, PhD, FCA, ACIT, HCIB, FICA, ACRMI, AMNIM</b>"
+            }
+        },
+        {
+            "type": "paragraph",
+            "data": {
+                "text": "Dr. Taiwo Oladimeji-Yisa is a seasoned financial services and public sector executive with over 30 years of experience spanning commercial banking, central banking, financial systems regulation, payments infrastructure, technology and institutional leadership."
+            }
+        },
+        {
+            "type": "paragraph",
+            "data": {
+                "text": "Prior to his current role as the Managing Director/Chief Executive Officer of the Lagos Independent System Operator (LAISO), he served at the Central Bank of Nigeria (CBN), where he rose to the position of Acting Director, Payments System Management Department. During his tenure, he played significant roles in shaping and advancing Nigeria's payments ecosystem, including contributions to the Payments System Vision 2025, Open Banking Framework and Regulatory Sandbox. He also chaired the Nigeria Electronic Fraud Forum (NeFF) and was instrumental in the development and implementation of the Industry Dispute Resolution System."
+            }
+        },
+        {
+            "type": "paragraph",
+            "data": {
+                "text": "His private sector career includes senior management positions at Citibank Nigeria, First Atlantic Bank (now FCMB) and First Bank of Nigeria, as well as advisory experience in professional practice. At First Atlantic Bank, he pioneered the implementation of the Finacle core banking application in Nigeria and West Africa and played a key role in the bank's transition from merchant to commercial banking."
+            }
+        },
+        {
+            "type": "paragraph",
+            "data": {
+                "text": "Taiwo brings extensive experience in financial systems, regulatory policy, institutional governance, risk management, digital transformation and stakeholder engagement. He holds a First Class Honours degree in Accounting from Obafemi Awolowo University, an MSc in Economics (Money and Banking) from the University of Port Harcourt and a PhD in Business Administration from Nasarawa State University. He is a Fellow of the Institute of Chartered Accountants of Nigeria (ICAN) and the Institute of Credit Administration, among other professional affiliations."
+            }
+        }
+    ],
+    "version": "2.19.3"
+}
